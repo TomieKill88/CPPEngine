@@ -11,7 +11,11 @@ project( cpp-engine
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 include(Initialization)
 
+option(BUILD_UNIT_TESTS OFF)
 
 add_subdirectory(app)
 add_subdirectory(src)
-#add_subdirectory(tests)
+
+if(BUILD_UNIT_TESTS)
+	add_subdirectory(tests)
+endif()
