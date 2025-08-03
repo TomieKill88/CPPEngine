@@ -6,7 +6,7 @@ set generatorName="Visual Studio 16 2019"
 set targetProcessorArchitecture=x86
 
 rem CMAKE Options
-set buildShared=true
+set buildShared=false
 set buildTests=false
 set logLevel=DEBUG
 
@@ -27,3 +27,5 @@ echo "           Building Project Ended!           "
 echo "*********************************************"
 
 cd %originalDir%
+
+set /p DUMMY=Hit ENTER to finish...
