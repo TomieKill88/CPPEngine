@@ -31,4 +31,11 @@ target_link_libraries(${TARGET_NAME} PUBLIC ${sfml_LIB_SOURCES})
 #--------------------------------------------------------------------------
 #target_include_directories(${TARGET_NAME} PUBLIC
 #							"${PROJECT_BINARY_DIR}"
-#							)							
+#							)
+
+#--------------------------------------------------------------------------
+# Install
+#--------------------------------------------------------------------------
+install(TARGETS ${TARGET_NAME}
+		DESTINATION ${INSTALL_BINDIR}
+)

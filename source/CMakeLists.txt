@@ -6,7 +6,6 @@ project( cpp-engine
 		DESCRIPTION "Small Cpp Game Engine with SFLM and ImGUI"
 		LANGUAGES CXX)
 
-
 # Add /cmake to CMAKE_MODULE_PATH and call Initialization.cmake
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 include(Initialization)
