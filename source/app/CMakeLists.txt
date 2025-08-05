@@ -1,24 +1,34 @@
 #--------------------------------------------------------------------------
 # Set Target up
 #--------------------------------------------------------------------------
-list(APPEND app_SOURCES  sfml/cppapp.cpp)
+set(TARGET_NAME cpp_app)
 					
-add_executable(CppApp ${app_SOURCES})
+add_executable(${TARGET_NAME})
+
+#--------------------------------------------------------------------------
+# Sources
+#--------------------------------------------------------------------------
+list(APPEND app_SOURCES  #sources
+						sfml/cppapp.cpp)
+
+target_sources(${TARGET_NAME} PRIVATE ${app_SOURCES})
 
 #--------------------------------------------------------------------------
 # Add libraries
 #--------------------------------------------------------------------------
 # OWN
-list(APPEND SFML_LIBS sfmlLib)
+#--------------------------------------------------------------------------
+list(APPEND sfml_LIB_SOURCES sfml_libs)
 
-target_link_libraries(CppApp PUBLIC ${SFML_LIBS})
+target_link_libraries(${TARGET_NAME} PUBLIC ${sfml_LIB_SOURCES})
 
+#--------------------------------------------------------------------------
 # EXTERNAL
+#--------------------------------------------------------------------------
 
 #--------------------------------------------------------------------------
 # Include Directories
 #--------------------------------------------------------------------------
-target_include_directories(CppApp PUBLIC
-							"${PROJECT_BINARY_DIR}"
-							"${LIBRARIES_DIRECTORY}"
-							)							
+#target_include_directories(${TARGET_NAME} PUBLIC
+#							"${PROJECT_BINARY_DIR}"
+#							)							
