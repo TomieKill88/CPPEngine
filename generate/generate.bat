@@ -3,7 +3,8 @@ echo off
 rem Cmake variables
 set visualStudioVersion=16
 set generatorName="Visual Studio 16 2019"
-set targetProcessorArchitecture=x86
+rem Win32/x64
+set targetArchitectureAndModel=Win32
 
 rem CMAKE Options
 set buildShared=false
@@ -20,7 +21,7 @@ echo "*********************************************"
 echo "              Building Project               "
 echo "*********************************************" 
 
-cmake -B %builDirectory% -G %generatorName% --loglevel=%logLevel% -DBUILD_SHARED_LIBS=!buildShared!
+cmake -B %builDirectory% -G %generatorName% -A %targetArchitectureAndModel% --loglevel=%logLevel% -DBUILD_SHARED_LIBS=!buildShared!
 
 echo "*********************************************"
 echo "           Building Project Ended!           "
