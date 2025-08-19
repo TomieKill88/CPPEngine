@@ -10,14 +10,20 @@ set(TARGET_NAME SFML)
 
 # SFML_LIB_DIR/cmake/SFML/SFMLConfig.cmake
 set(SFML_STATIC_LIBRARIES FALSE)
-# For some reason the set variables were not working
-set(SFML_DIR "C:/Repositories/SFML-2.6.2/lib/cmake/SFML")
+# Set SFML_DIR for find_package can find sfmlCONFIG.cmake
+set(SFML_DIR "${sfml_LIBDIR}/cmake/SFML")
 
 # Gives targets sfml-graphics, sfml-audio, etc for target_link_libraries(myapp sfml-graphics sfml-audio)
 if (NOT SFML_FOUND)
-	find_package(${TARGET_NAME} COMPONENTS system window graphics network audio main REQUIRED)
+	find_package(${TARGET_NAME} REQUIRED system window graphics network audio main)
 endif()
 
+
+#--------------------------------------------------------------------------
+# Include Directories
+#--------------------------------------------------------------------------
+# State that anybody linking to sfml needs to include the include directory
+#target_include_directories(${TARGET_NAME} INTERFACE ${SFML_INCLUDE_DIR})
 
 #--------------------------------------------------------------------------
 # Install
@@ -30,6 +36,10 @@ list(APPEND sfml_TARGETS sfml-system
 						 
 install(IMPORTED_RUNTIME_ARTIFACTS ${sfml_TARGETS} 
 		DESTINATION ${INSTALL_BINDIR}
+		)
+		
+install(IMPORTED_RUNTIME_ARTIFACTS ${sfml_TARGETS} 
+		DESTINATION "${OUT_DIRECTORY}/Debug"
 		)
 
 #message("The debug lib is at " ${SFML_LIB_DIR_DEBUG})
@@ -47,12 +57,3 @@ install(IMPORTED_RUNTIME_ARTIFACTS ${sfml_TARGETS}
 #							IMPORTED_IMP_LOCATION ${SFML_LIB_DIR})
 
 
-#--------------------------------------------------------------------------
-# Include Directories
-#--------------------------------------------------------------------------
-# State that anybody linking to sfml needs to include the include directory
-#target_include_directories(${TARGET_NAME} INTERFACE ${SFML_INCLUDE_DIR})
-
-#--------------------------------------------------------------------------
-# Copy DLLs to PROJECT BIN
-#--------------------------------------------------------------------------
