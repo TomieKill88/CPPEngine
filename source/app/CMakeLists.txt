@@ -1,29 +1,29 @@
 #--------------------------------------------------------------------------
 # Set Target up
 #--------------------------------------------------------------------------
-set(TARGET_NAME cpp_app)
+set(TARGET_NAME game)
 					
 add_executable(${TARGET_NAME})
 
 #--------------------------------------------------------------------------
 # Sources
 #--------------------------------------------------------------------------
-list(APPEND app_SOURCES  #sources
-						sfml/cppapp.cpp)
+list(APPEND game_SOURCES  #sources
+						game/game.cpp)
 
-target_sources(${TARGET_NAME} PRIVATE ${app_SOURCES})
+target_sources(${TARGET_NAME} PRIVATE ${game_SOURCES})
 
 #--------------------------------------------------------------------------
 # Add libraries
 #--------------------------------------------------------------------------
 # OWN
 #--------------------------------------------------------------------------
-list(APPEND sfml_LIB_SOURCES 
-	sfml_libs
+list(APPEND game_LIB_SOURCES 
+	engine
 	imgui
 )
 
-target_link_libraries(${TARGET_NAME} PUBLIC ${sfml_LIB_SOURCES})
+target_link_libraries(${TARGET_NAME} PUBLIC ${game_LIB_SOURCES})
 
 #--------------------------------------------------------------------------
 # EXTERNAL
