@@ -46,9 +46,9 @@ list(APPEND sfml_PUBLIC_LIBS  #LIBRARIES
 							sfml/sfmlTest.hpp
 							)
 
-install(FILES ${sfml_PUBLIC_LIBS}
-		DESTINATION ${INSTALL_INCLUDEDIR}
-		)
+#install(FILES ${sfml_PUBLIC_LIBS}
+#		DESTINATION ${INSTALL_INCLUDEDIR}
+#		)
 
 
 

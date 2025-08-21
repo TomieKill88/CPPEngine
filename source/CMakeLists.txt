@@ -17,8 +17,8 @@ option(BUILD_UNIT_TESTS OFF)
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_LIST_DIR}/cmake/dependencies/sfml)
 include(sfml)
 
-#list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_LIST_DIR}/dependencies/imgui)
-#include(imgui)
+list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_LIST_DIR}/cmake/dependencies/imgui)
+include(imgui)
 
 # Libraries and applications
 add_subdirectory(app)

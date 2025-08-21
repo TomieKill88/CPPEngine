@@ -18,7 +18,10 @@ target_sources(${TARGET_NAME} PRIVATE ${app_SOURCES})
 #--------------------------------------------------------------------------
 # OWN
 #--------------------------------------------------------------------------
-list(APPEND sfml_LIB_SOURCES sfml_libs)
+list(APPEND sfml_LIB_SOURCES 
+	sfml_libs
+	imgui
+)
 
 target_link_libraries(${TARGET_NAME} PUBLIC ${sfml_LIB_SOURCES})
 
