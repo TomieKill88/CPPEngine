@@ -1,40 +1,36 @@
+# https://google.github.io/googletest/quickstart-cmake.html
+# https://pikotutorial.com/build-run-c-unit-tests-with-cmake/
+
 #--------------------------------------------------------------------------
 # Set Target up
 #--------------------------------------------------------------------------
-set(TARGET_NAME game)
-					
-add_executable(${TARGET_NAME})
+enable_testing()
+
+set(UNIT_TEST_TARGET_NAME unittests)
+
+add_executable(${UNIT_TEST_TARGET_NAME})
 
 #--------------------------------------------------------------------------
 # Sources
 #--------------------------------------------------------------------------
-list(APPEND game_SOURCES  #sources
-						game/game.cpp)
-
-target_sources(${TARGET_NAME} PRIVATE ${game_SOURCES})
+target_sources(${UNIT_TEST_TARGET_NAME} PRIVATE 
+    src/tests.cpp
+)
 
 #--------------------------------------------------------------------------
 # Add libraries
 #--------------------------------------------------------------------------
-list(APPEND game_LIB_SOURCES 
+target_link_libraries(${UNIT_TEST_TARGET_NAME} PRIVATE 
 #OWN
 	engine
 #EXTERNAL
-	imgui
+	GTest::gtest_main
 )
 
-target_link_libraries(${TARGET_NAME} PUBLIC ${game_LIB_SOURCES})
+target_include_directories(${UNIT_TEST_TARGET_NAME} PRIVATE ${sfml_INCLUDEDIR}
+															${LIBRARIES_DIRECTORY})
 
 #--------------------------------------------------------------------------
-# Include Directories
+# Add Tests
 #--------------------------------------------------------------------------
-#target_include_directories(${TARGET_NAME} PUBLIC
-#							"${PROJECT_BINARY_DIR}"
-#							)
-
-#--------------------------------------------------------------------------
-# Install
-#--------------------------------------------------------------------------
-install(TARGETS ${TARGET_NAME}
-		DESTINATION ${INSTALL_BINDIR}
-)
+add_test(NAME ${UNIT_TEST_TARGET_NAME} COMMAND ${UNIT_TEST_TARGET_NAME})

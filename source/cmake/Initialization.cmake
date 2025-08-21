@@ -23,6 +23,10 @@ include(paths)
 # Output Directories
 #--------------------------------------------------------------------------
 # Set Output Directories to make debugging easy. Externall DLLs have
-# to be sent here too or the Debugger wont find them
-set( CMAKE_RUNTIME_OUTPUT_DIRECTORY ${OUT_DIRECTORY})
-set( CMAKE_LIBRARY_OUTPUT_DIRECTORY ${OUT_DIRECTORY})
+# to be sent here too or the Debugger wont find them. Is a Hack but
+# I only care about this for debugging
+set( CMAKE_RUNTIME_OUTPUT_DIRECTORY_DEBUG "${OUT_DIRECTORY}/bin")
+set( CMAKE_LIBRARY_OUTPUT_DIRECTORY_DEBUG "${OUT_DIRECTORY}/lib")
+set( CMAKE_ARCHIVE_OUTPUT_DIRECTORY_DEBUG "${OUT_DIRECTORY}/include")
+
+set( CMAKE_INSTALL_PREFIX ${OUT_DIRECTORY})

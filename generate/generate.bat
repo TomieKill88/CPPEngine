@@ -8,7 +8,7 @@ set targetArchitectureAndModel=Win32
 
 rem CMAKE Options
 set buildShared=false
-set buildTests=false
+set buildTests=true
 set logLevel=DEBUG
 
 rem Directories
@@ -21,7 +21,7 @@ echo "*********************************************"
 echo "              Building Project               "
 echo "*********************************************" 
 
-cmake -B %builDirectory% -G %generatorName% -A %targetArchitectureAndModel% --loglevel=%logLevel% -DBUILD_SHARED_LIBS=!buildShared!
+cmake -B %builDirectory% -G %generatorName% -A %targetArchitectureAndModel% --loglevel=%logLevel% -DBUILD_SHARED_LIBS=!buildShared! -DBUILD_UNIT_TESTS=!buildTests!
 
 echo "*********************************************"
 echo "           Building Project Ended!           "
