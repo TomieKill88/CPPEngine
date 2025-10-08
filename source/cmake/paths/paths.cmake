@@ -27,3 +27,7 @@ set(sfml_LIBDIR "${sfml_DIRECTORY}/lib" CACHE PATH "Path to sfml libs")
 set(sfml_INCLUDEDIR "${sfml_DIRECTORY}/include" CACHE PATH "Path to sfml includes")
 
 set(imgui_DIRECTORY "${EXT_LIBRARIES_DIRECTORY}/imgui" CACHE PATH "Path to ImGUI")
+
+
+set(imgui-sfml_DIRECTORY "${EXT_LIBRARIES_DIRECTORY}/imgui-sfml" CACHE PATH "Path to imgui-sfml")
+set(IMGUI_DIR "${EXT_LIBRARIES_DIRECTORY}/imgui" CACHE PATH "Path to ImGUI for imgui-sfml")
