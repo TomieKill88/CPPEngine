@@ -11,6 +11,7 @@ set(CMAKE_VS_INCLUDE_INSTALL_TO_DEFAULT_BUILD 1)
 # Include CMake Modules
 #--------------------------------------------------------------------------
 include(GNUInstallDirs)
+include(FetchContent)
 
 #--------------------------------------------------------------------------
 # Include OWN CMake Modules

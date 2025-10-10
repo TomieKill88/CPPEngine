@@ -20,14 +20,6 @@ std::string ExePath() {
 
 int main(int argc, char* argv[])
 {
-    // convert input to double
-    /*const double inputValue = 99;
-
-    // calculate square root
-    const double outputValue = mysqrt(inputValue);
-    std::cout << "The square root of " << inputValue << " is " << outputValue
-        << std::endl;*/
-
     std::cout << "my directory is " << ExePath() << "\n";
 
     callWindowTest();

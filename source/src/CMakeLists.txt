@@ -23,16 +23,13 @@ target_include_directories(${TARGET_NAME} INTERFACE ${CMAKE_CURRENT_SOURCE_DIR})
 #--------------------------------------------------------------------------
 # External Libraries
 #--------------------------------------------------------------------------
-list(APPEND engine_LIBRARIES sfml-system 
-						 sfml-window 
-						 sfml-graphics 
-						 sfml-network 
-						 sfml-audio)
+list(APPEND engine_LIBRARIES 
+						 #sfml-graphics 
+						 ImGui-SFML::ImGui-SFML 
+						 SFML::Graphics
+						 )
 
 target_link_libraries(${TARGET_NAME} ${engine_LIBRARIES})
-
-target_include_directories(${TARGET_NAME} PRIVATE ${sfml_INCLUDEDIR}
-												  ${sfml_BINDIR})
 
 #--------------------------------------------------------------------------
 # Install

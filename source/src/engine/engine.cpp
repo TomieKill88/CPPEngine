@@ -5,7 +5,10 @@
 ////////////////////////////////////////////////////////////
 // Headers
 ////////////////////////////////////////////////////////////
-#include <SFML/Window.hpp>
+#include <SFML/Graphics.hpp>
+#include <imgui-SFML.h>
+#include <imgui.h>
+
 
 
 // a hack square root calculation using simple operations
@@ -27,36 +30,34 @@ double mysqrt(double x)
 ////////////////////////////////////////////////////////////
 void callWindowTest()
 {    
-    // Request a 24-bits depth buffer when creating the window
-    sf::ContextSettings contextSettings;
-    contextSettings.depthBits = 24;
+    auto window = sf::RenderWindow(sf::VideoMode({ 1920u, 1080u }), "CMake SFML Project");
+    window.setFramerateLimit(144);
+    if (!ImGui::SFML::Init(window))
+        return;
 
-    // Create the main window
-    sf::Window window(sf::VideoMode(640, 480), "SFML window with OpenGL", sf::Style::Default, contextSettings);
-
-    // Make it the active window for OpenGL calls
-    window.setActive();   
-
-    // Create a clock for measuring the time elapsed
     sf::Clock clock;
-
-    // Start the game loop
     while (window.isOpen())
     {
-        // Process events
-        sf::Event event;
-        while (window.pollEvent(event))
+        while (const std::optional event = window.pollEvent())
         {
-            // Close window: exit
-            if (event.type == sf::Event::Closed)
-                window.close();
+            ImGui::SFML::ProcessEvent(window, *event);
 
-            // Escape key: exit
-            if ((event.type == sf::Event::KeyPressed) && (event.key.code == sf::Keyboard::Escape))
+            if (event->is<sf::Event::Closed>())
+            {
                 window.close();
-
-            // Finally, display the rendered frame on screen
-            window.display();
+            }
         }
+
+        ImGui::SFML::Update(window, clock.restart());
+
+        ImGui::Begin("Hello, world!");
+        ImGui::Button("Look at this pretty button");
+        ImGui::End();
+
+        window.clear();
+        ImGui::SFML::Render(window);
+        window.display();
     }
+
+    ImGui::SFML::Shutdown();
 }

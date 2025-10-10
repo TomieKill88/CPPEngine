@@ -20,7 +20,7 @@ list(APPEND game_LIB_SOURCES
 #OWN
 	engine
 #EXTERNAL
-	imgui
+	#ImGui-SFML::ImGui-SFML
 )
 
 target_link_libraries(${TARGET_NAME} PUBLIC ${game_LIB_SOURCES})

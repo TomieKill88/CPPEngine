@@ -8,7 +8,7 @@ set targetArchitectureAndModel=Win32
 
 rem CMAKE Options
 set buildShared=false
-set buildTests=true
+set buildTests=false
 set logLevel=DEBUG
 
 rem Directories
