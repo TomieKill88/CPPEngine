@@ -10,18 +10,6 @@
 #include <imgui.h>
 
 
-
-// a hack square root calculation using simple operations
-double mysqrt(double x)
-{
-    if (x <= 0) {
-        return 0;
-    }
-
-    return x * x;
-}
-
-
 ////////////////////////////////////////////////////////////
 /// Entry point of application
 ///
@@ -30,10 +18,20 @@ double mysqrt(double x)
 ////////////////////////////////////////////////////////////
 void callWindowTest()
 {    
-    auto window = sf::RenderWindow(sf::VideoMode({ 1920u, 1080u }), "CMake SFML Project");
+    uint32_t screenWidth = 640;
+    uint32_t screenHeight = 480;
+    auto window = sf::RenderWindow(sf::VideoMode({ screenWidth, screenHeight }), "CMake SFML Project");
     window.setFramerateLimit(144);
+
     if (!ImGui::SFML::Init(window))
         return;
+
+    sf::CircleShape shape(100.f);
+    shape.setFillColor(sf::Color::Green);
+    float speedX = 1.0f;
+    float speedY = 1.0f;
+
+    sf::Font("resources/AovelSans.ttf");
 
     sf::Clock clock;
     while (window.isOpen())
@@ -48,14 +46,34 @@ void callWindowTest()
             }
         }
 
+        // You must create all widgets between ImGui::SFML::Update() and ImGui::Render()
         ImGui::SFML::Update(window, clock.restart());
+
 
         ImGui::Begin("Hello, world!");
         ImGui::Button("Look at this pretty button");
         ImGui::End();
 
         window.clear();
+
+        shape.move(sf::Vector2f{ speedX,speedY });
+
+        auto shapeBounds = shape.getGlobalBounds();
+        auto shapeBoundSize = shapeBounds.size;
+
+        auto newPos = shape.getPosition();
+        if ((newPos.x + shapeBoundSize.x) > window.getSize().x || newPos.x < 0.0f)
+            speedX *= -1;
+        if ((newPos.y + shapeBoundSize.y) > window.getSize().y || newPos.y < 0.0f)
+            speedY *= -1;
+
+        //Draw here
+        window.draw(shape);
+
+        // Dra GUI Elements AFTER SFML so they overlap correctly
+        //Don’t call ImGui::Render, only call ImGui::SFML::Render
         ImGui::SFML::Render(window);
+
         window.display();
     }
 
