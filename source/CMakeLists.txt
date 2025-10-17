@@ -26,6 +26,7 @@ include(imgui-sfml)
 # Libraries and applications
 add_subdirectory(app)
 add_subdirectory(src)
+add_subdirectory(resources)
 
 #if(BUILD_UNIT_TESTS)
 #	list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_LIST_DIR}/cmake/dependencies/unittests)

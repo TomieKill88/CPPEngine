@@ -4,17 +4,17 @@
 set(LIBRARIES_DIRECTORY "${PROJECT_SOURCE_DIR}/src" CACHE PATH "Path to projects own libraries")
 
 #--------------------------------------------------------------------------
-# OUTPUT
-#--------------------------------------------------------------------------
-set(OUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/out" CACHE PATH "Output directory for debugging")
-
-#--------------------------------------------------------------------------
 # INSTALL
 #--------------------------------------------------------------------------
 set(INSTALL_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/target" CACHE PATH "Install directory for project")
 set(INSTALL_BINDIR "${INSTALL_DIRECTORY}/bin" CACHE PATH "Install directory for project binaries")
 set(INSTALL_LIBDIR "${INSTALL_DIRECTORY}/lib" CACHE PATH "Install directory for project libs")
 set(INSTALL_INCLUDEDIR "${INSTALL_DIRECTORY}/include" CACHE PATH "Install directory for project public header")
+
+#--------------------------------------------------------------------------
+# OUTPUT
+#--------------------------------------------------------------------------
+set(OUT_DIRECTORY "${INSTALL_DIRECTORY}" CACHE PATH "Output directory for debugging")
 
 #--------------------------------------------------------------------------
 # EXTERNAL
