@@ -41,6 +41,10 @@ void callWindowTest()
     //Set origin point to center of label
     label.setOrigin(label.getLocalBounds().getCenter());
 
+    // Variables for widgets
+    char nameInput[100] = "";
+    int inputR = 0, inputG = 0, inputB = 0;
+
     sf::Clock clock;
     while (window.isOpen())
     {
@@ -58,8 +62,45 @@ void callWindowTest()
         ImGui::SFML::Update(window, clock.restart());
 
 
-        ImGui::Begin("Hello, world!");
-        ImGui::Button("Look at this pretty button");
+        ImGui::Begin("Shape Controller");
+
+        // Shape name
+        ImGui::InputTextWithHint("Name", "Enter shape name", nameInput, IM_ARRAYSIZE(nameInput));
+        ImGui::SameLine(); if (ImGui::Button("Set"))
+        {
+            label.setString(sf::String(nameInput));
+            label.setOrigin(label.getLocalBounds().getCenter());
+        }
+
+        sf::Color shapeColor;
+        // Set width of next widget (popItemWidth to revert)
+        ImGui::PushItemWidth(30);
+        // Put 0 in step so there are no buttons
+        ImGui::InputInt("R", &inputR, 0);
+        if (inputR < 0) inputR = 0;
+        if (inputR > 255) inputR = 255;
+        shapeColor.r = static_cast<uint8_t>(inputR);
+
+        ImGui::SameLine();
+        // Set width of next widget (popItemWidth to revert)
+        ImGui::PushItemWidth(30);
+        // Put 0 in step so there are no buttons
+        ImGui::InputInt("G", &inputG, 0);
+        if (inputG < 0) inputG = 0;
+        if (inputG > 255) inputG = 255;
+        shapeColor.g = static_cast<uint8_t>(inputG);
+
+        ImGui::SameLine();
+        // Set width of next widget (popItemWidth to revert)
+        ImGui::PushItemWidth(30);
+        // Put 0 in step so there are no buttons
+        ImGui::InputInt("B", &inputB, 0);
+        if (inputB < 0) inputB = 0;
+        if (inputB > 255) inputB = 255;
+        shapeColor.b = static_cast<uint8_t>(inputB);
+
+        ImGui::SameLine(); if (ImGui::Button("Set##Color")){ shape.setFillColor(shapeColor); }
+        
         ImGui::End();
 
         window.clear();
