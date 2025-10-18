@@ -31,7 +31,15 @@ void callWindowTest()
     float speedX = 1.0f;
     float speedY = 1.0f;
 
-    sf::Font("resources/AovelSans.ttf");
+    sf::Font font("resources/AovelSans.ttf");
+    sf::Text label(font);
+
+    // set the string to display
+    label.setString("Pelota");
+    // set the character size in pixels
+    label.setCharacterSize(24); 
+    //Set origin point to center of label
+    label.setOrigin(label.getLocalBounds().getCenter());
 
     sf::Clock clock;
     while (window.isOpen())
@@ -67,8 +75,11 @@ void callWindowTest()
         if ((newPos.y + shapeBoundSize.y) > window.getSize().y || newPos.y < 0.0f)
             speedY *= -1;
 
+        label.setPosition(shape.getGlobalBounds().getCenter());
+
         //Draw here
         window.draw(shape);
+        window.draw(label);
 
         // Dra GUI Elements AFTER SFML so they overlap correctly
         //Don’t call ImGui::Render, only call ImGui::SFML::Render
