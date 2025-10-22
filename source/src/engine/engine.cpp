@@ -1,4 +1,5 @@
 #include <iostream>
+#include <memory>
 
 #include "engine.hpp"
 
@@ -9,6 +10,23 @@
 #include <imgui-SFML.h>
 #include <imgui.h>
 
+
+std::shared_ptr<sf::Shape> getShape(int type)
+{    
+    if (type == 1)
+        return std::make_shared<sf::CircleShape>(30.0f);
+    else
+        return std::make_shared<sf::RectangleShape>();
+}
+
+void drawTest(sf::RenderWindow& window)
+{
+
+    std::shared_ptr<sf::Shape> test = getShape(2);
+    auto test2 = *(std::dynamic_pointer_cast<sf::RectangleShape>(test).get());
+    test2.setSize({ 50.0, 50.0 });
+    window.draw(test2);
+}
 
 ////////////////////////////////////////////////////////////
 /// Entry point of application
@@ -25,8 +43,10 @@ void callWindowTest()
 
     if (!ImGui::SFML::Init(window))
         return;
-
+    
     sf::CircleShape shape(100.f);
+
+
     shape.setFillColor(sf::Color::Green);
     float speedX = 1.0f;
     float speedY = 1.0f;
@@ -64,7 +84,8 @@ void callWindowTest()
 
         ImGui::Begin("Shape Controller");
 
-        // Shape name
+        //////////  Shape name  ///////////////
+
         ImGui::InputTextWithHint("Name", "Enter shape name", nameInput, IM_ARRAYSIZE(nameInput));
         ImGui::SameLine(); if (ImGui::Button("Set"))
         {
@@ -72,6 +93,12 @@ void callWindowTest()
             label.setOrigin(label.getLocalBounds().getCenter());
         }
 
+        //////////  Shape size  ///////////////
+
+        float radius = shape.getRadius();
+        ImGui::SliderFloat("Radius", &radius, 1.0f, 200.0f, "%.1f", ImGuiSliderFlags_::ImGuiSliderFlags_AlwaysClamp);
+        shape.setRadius(radius);
+        //////////  Shape Color  ///////////////
         sf::Color shapeColor;
         // Set width of next widget (popItemWidth to revert)
         ImGui::PushItemWidth(30);
@@ -101,9 +128,12 @@ void callWindowTest()
 
         ImGui::SameLine(); if (ImGui::Button("Set##Color")){ shape.setFillColor(shapeColor); }
         
+
         ImGui::End();
 
         window.clear();
+
+        //////////  Wall collision  ///////////////
 
         shape.move(sf::Vector2f{ speedX,speedY });
 
@@ -121,6 +151,8 @@ void callWindowTest()
         //Draw here
         window.draw(shape);
         window.draw(label);
+
+        drawTest(window);
 
         // Dra GUI Elements AFTER SFML so they overlap correctly
         //Don’t call ImGui::Render, only call ImGui::SFML::Render
