@@ -4,7 +4,8 @@
 #include <iostream>
 #include <string>
 
-#include "engine/engine.hpp"
+#include "src/engine.hpp"
+#include "src/ConfigFileReader.hpp"
 
 
 #include <windows.h>
@@ -22,7 +23,12 @@ int main(int argc, char* argv[])
 {
     std::cout << "my directory is " << ExePath() << "\n";
 
-    callWindowTest();
+    //callWindowTest();
+
+    std::string fileName = "config/config.txt";
+    std::vector<std::vector<std::string>> tokens;
+
+    ConfigFileReader::getFileTokens(fileName, tokens);
 
     return 0;
 }

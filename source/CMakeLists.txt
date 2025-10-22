@@ -25,8 +25,7 @@ include(imgui-sfml)
 
 # Libraries and applications
 add_subdirectory(app)
-add_subdirectory(src)
-add_subdirectory(resources)
+add_subdirectory(libs)
 
 #if(BUILD_UNIT_TESTS)
 #	list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_LIST_DIR}/cmake/dependencies/unittests)
@@ -35,3 +34,24 @@ add_subdirectory(resources)
 #	add_subdirectory(tests)
 #endif()
 
+# Install config files and resources
+#--------------------------------------------------------------------------
+# Resources (https://www.fontspace.com/category/ttf?p=2)
+#--------------------------------------------------------------------------
+list(APPEND resources  resources/AovelSans.ttf)
+#--------------------------------------------------------------------------
+# Config
+#--------------------------------------------------------------------------						
+
+list(APPEND config  app/config/config.txt)						
+
+#--------------------------------------------------------------------------
+# Install
+#--------------------------------------------------------------------------
+install(FILES ${resources}
+		DESTINATION ${INSTALL_BINDIR}/resources
+)
+
+install(FILES ${config}
+		DESTINATION ${INSTALL_BINDIR}/config
+)
