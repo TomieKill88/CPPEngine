@@ -53,7 +53,6 @@ void callWindowTest()
 
     sf::Font font("resources/AovelSans.ttf");
     sf::Text label(font);
-
     // set the string to display
     label.setString("Pelota");
     // set the character size in pixels

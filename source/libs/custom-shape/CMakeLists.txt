@@ -1,40 +1,39 @@
 #--------------------------------------------------------------------------
 # Set Target up
 #--------------------------------------------------------------------------
-set(TARGET_NAME engine)
+set(TARGET_NAME custom-shape)
 		   
 add_library(${TARGET_NAME} STATIC)
 
 #--------------------------------------------------------------------------
 # Sources
 #--------------------------------------------------------------------------
-list(APPEND engine_SOURCES  # sources
-								src/engine.hpp
-								src/engine.cpp)
+list(APPEND custom_shape_SOURCES  # sources
+								src/CustomShape.hpp
+								src/CustomShape.cpp)
 
-target_sources(${TARGET_NAME} PRIVATE ${engine_SOURCES})
+target_sources(${TARGET_NAME} PRIVATE ${custom_shape_SOURCES})
 
 #--------------------------------------------------------------------------
 # Include Directories
 #--------------------------------------------------------------------------
-# State that anybody linking to engine needs to include the current source directory
+# State that anybody linking to library needs to include the current source directory
 target_include_directories(${TARGET_NAME} INTERFACE ${CMAKE_CURRENT_SOURCE_DIR})
 
 #--------------------------------------------------------------------------
 # Group Files (mainly for VS)
 #--------------------------------------------------------------------------
-
-source_group(src FILES ${engine_SOURCES})
+source_group(src FILES ${custom_shape_SOURCES})
 
 #--------------------------------------------------------------------------
 # External Libraries
 #--------------------------------------------------------------------------
-list(APPEND engine_LIBRARIES 
+list(APPEND custom_shape_LIBRARIES 
 						 ImGui-SFML::ImGui-SFML 
 						 SFML::Graphics
 						 )
 
-target_link_libraries(${TARGET_NAME} ${engine_LIBRARIES})
+target_link_libraries(${TARGET_NAME} ${custom_shape_LIBRARIES})
 
 #--------------------------------------------------------------------------
 # Install
@@ -44,11 +43,11 @@ install(TARGETS ${TARGET_NAME}
 		)
 
 # Only for public libraries that will be used by the app
-list(APPEND engine_PUBLIC_LIBS  #LIBRARIES
-							src/engine.hpp
+list(APPEND custom_shape_PUBLIC_LIBS  #LIBRARIES
+							src/CustomShape.hpp
 							)
 
-#install(FILES ${sfml_PUBLIC_LIBS}
+#install(FILES ${custom_shape_PUBLIC_LIBS}
 #		DESTINATION ${INSTALL_INCLUDEDIR}
 #		)
 
