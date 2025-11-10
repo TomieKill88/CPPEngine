@@ -2,7 +2,7 @@ echo off
 
 rem Cmake variables
 set visualStudioVersion=16
-set generatorName="Visual Studio 16 2019"
+set generatorName="Visual Studio 17 2022"
 rem Win32/x64
 set targetArchitectureAndModel=Win32
 
