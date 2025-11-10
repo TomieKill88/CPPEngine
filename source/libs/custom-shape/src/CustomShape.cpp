@@ -15,19 +15,19 @@ namespace CShape
 		initialData.velX = std::stof(initData[4]);
 		initialData.velY = std::stof(initData[5]);
 		initialData.r	 = std::stoi(initData[6]);
-		initialData.r	 = std::stoi(initData[7]);
-		initialData.r	 = std::stoi(initData[8]);
+		initialData.g	 = std::stoi(initData[7]);
+		initialData.b	 = std::stoi(initData[8]);
 
 		// Data tokens:
 		// Type Labe PosX PosY VelX VelY R G B (Widht Height)/(Radius)
-		if (initData[0].compare("Rectangle"))
+		if (initData[0].compare("Rectangle") == 0)
 		{
 			shape = std::make_shared<sf::RectangleShape>();
 			shapeType = CustomShapeTypeEnum::RECTANGLE;
 
 			std::dynamic_pointer_cast<sf::RectangleShape>(shape)->setSize({ std::stof(initData[9]) , std::stof(initData[10]) });			
 		}
-		else if (initData[0].compare("Circle"))
+		else if (initData[0].compare("Circle") == 0)
 		{
 			shape = std::make_shared<sf::CircleShape>();
 			shapeType = CustomShapeTypeEnum::CIRCLE;

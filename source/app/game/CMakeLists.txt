@@ -20,8 +20,10 @@ list(APPEND game_LIB_SOURCES
 #OWN
 	engine
 	config-file-reader
+	custom-shape
 #EXTERNAL
-	#ImGui-SFML::ImGui-SFML
+	ImGui-SFML::ImGui-SFML 
+	SFML::Graphics
 )
 
 target_link_libraries(${TARGET_NAME} PUBLIC ${game_LIB_SOURCES})
@@ -44,8 +46,7 @@ source_group(src FILES ${game_SOURCES})
 #https://stackoverflow.com/questions/47244633/set-visual-studio-debugger-working-directory-to-executable-output-directory-in-c
 # Ensures that the debugger can find the resources and config directories
 if(MSVC)
-set_target_properties(${TARGET_NAME} PROPERTIES VS_DEBUGGER_WORKING_DIRECTORY "${OUT_DIRECTORY}/bin")
-
+	set_target_properties(${TARGET_NAME} PROPERTIES VS_DEBUGGER_WORKING_DIRECTORY "${OUT_DIRECTORY}/bin")
 endif()
 
 #--------------------------------------------------------------------------
