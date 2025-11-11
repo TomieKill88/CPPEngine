@@ -21,6 +21,7 @@ list(APPEND game_LIB_SOURCES
 	engine
 	helper-tools
 	actor-factory
+	gui-factory
 #EXTERNAL
 	ImGui-SFML::ImGui-SFML 
 	SFML::Graphics
