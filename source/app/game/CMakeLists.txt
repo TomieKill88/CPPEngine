@@ -20,7 +20,7 @@ list(APPEND game_LIB_SOURCES
 #OWN
 	engine
 	helper-tools
-	custom-shape
+	actor-factory
 #EXTERNAL
 	ImGui-SFML::ImGui-SFML 
 	SFML::Graphics
