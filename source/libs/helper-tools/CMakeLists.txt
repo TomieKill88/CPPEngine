@@ -1,18 +1,18 @@
 #--------------------------------------------------------------------------
 # Set Target up
 #--------------------------------------------------------------------------
-set(TARGET_NAME config-file-reader)
+set(TARGET_NAME helper-tools)
 		   
 add_library(${TARGET_NAME} STATIC)
 
 #--------------------------------------------------------------------------
 # Sources
 #--------------------------------------------------------------------------
-list(APPEND reader_SOURCES  # sources
+list(APPEND helper-tools_SOURCES  # sources
 								src/ConfigFileReader.hpp
 								src/ConfigFileReader.cpp)
 
-target_sources(${TARGET_NAME} PRIVATE ${reader_SOURCES})
+target_sources(${TARGET_NAME} PRIVATE ${helper-tools_SOURCES})
 
 #--------------------------------------------------------------------------
 # Include Directories
@@ -24,7 +24,7 @@ target_include_directories(${TARGET_NAME} INTERFACE ${CMAKE_CURRENT_SOURCE_DIR})
 # Group Files (mainly for VS)
 #--------------------------------------------------------------------------
 
-source_group(src FILES ${reader_SOURCES})
+source_group(src FILES ${helper-tools_SOURCES})
 
 #--------------------------------------------------------------------------
 # External Libraries
@@ -39,7 +39,7 @@ install(TARGETS ${TARGET_NAME}
 		)
 
 # Only for public libraries that will be used by the app
-list(APPEND reader_PUBLIC_LIBS  #LIBRARIES
+list(APPEND helper-tools_PUBLIC_LIBS  #LIBRARIES
 							src/ConfigFileReader.hpp
 							)
 

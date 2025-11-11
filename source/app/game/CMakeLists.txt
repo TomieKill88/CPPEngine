@@ -19,7 +19,7 @@ target_sources(${TARGET_NAME} PRIVATE ${game_SOURCES})
 list(APPEND game_LIB_SOURCES 
 #OWN
 	engine
-	config-file-reader
+	helper-tools
 	custom-shape
 #EXTERNAL
 	ImGui-SFML::ImGui-SFML 
