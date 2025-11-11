@@ -111,9 +111,12 @@ int main(int argc, char* argv[])
         ////////// PHYSICS ///////////
         for (auto shape : shapes)
         {
-            shape->checkCollisionWindow(window);
-            shape->update();
-            shape->draw(window);
+            if (shape->isEnabled())
+            {
+                shape->checkCollisionWindow(window);
+                shape->update();
+                shape->draw(window);
+            }            
         }
 
         ////////// DRAW CHARACTERS ///////////
