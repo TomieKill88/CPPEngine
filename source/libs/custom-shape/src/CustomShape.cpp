@@ -150,5 +150,7 @@ namespace CShape
 			window.draw(*(std::dynamic_pointer_cast<sf::CircleShape>(shape).get()));
 			break;
 		}
+
+		window.draw(shapeLabel);
 	}
 }
