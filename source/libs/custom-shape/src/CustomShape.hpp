@@ -70,5 +70,6 @@ namespace CShape
 		void checkCollisionWindow(const sf::RenderWindow& window);
 
 		void draw(sf::RenderWindow& window);
+
 	};
 }

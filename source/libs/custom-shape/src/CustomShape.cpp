@@ -35,13 +35,13 @@ namespace CShape
 			std::dynamic_pointer_cast<sf::CircleShape>(shape)->setRadius({ std::stof(initData[9]) });
 		}
 
-		setLabel(currentData.label);
+		setLabel(initialData.label);
 		// set the character size in pixels
 		shapeLabel.setCharacterSize(24);
 
-		setPosition({ currentData.posX, currentData.posY });
-		setVelocity(sf::Vector2(currentData.velX, currentData.velX));
-		setColor(currentData.r, currentData.g, currentData.b);
+		setPosition({ initialData.posX, initialData.posY });
+		setVelocity(sf::Vector2(initialData.velX, initialData.velX));
+		setColor(initialData.r, initialData.g, initialData.b);
 
 		enable(true);
 	}

@@ -114,7 +114,7 @@ int main(int argc, char* argv[])
             shape->checkCollisionWindow(window);
             shape->update();
             shape->draw(window);
-        }  
+        }
 
         ////////// DRAW CHARACTERS ///////////
 
