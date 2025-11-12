@@ -63,6 +63,8 @@ namespace CShape
 		void setColor(const uint8_t r, const uint8_t g, const uint8_t b);
 		void setScale(const float scale);
 
+		std::string getLabel();
+
 		void reset();
 
 		void update();

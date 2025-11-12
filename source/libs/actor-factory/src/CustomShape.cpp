@@ -90,6 +90,11 @@ namespace CShape
 		currentData.scale = scale;
 	}
 
+	std::string CustomShape::getLabel()
+	{
+		return currentData.label;
+	}
+
 	void CustomShape::reset()
 	{
 		setLabel(initialData.label);
@@ -153,4 +158,6 @@ namespace CShape
 
 		window.draw(shapeLabel);
 	}
+
+	
 }

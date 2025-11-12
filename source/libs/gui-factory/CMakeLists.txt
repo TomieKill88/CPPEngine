@@ -9,6 +9,8 @@ add_library(${TARGET_NAME} STATIC)
 # Sources
 #--------------------------------------------------------------------------
 list(APPEND gui_factory_SOURCES  # sources
+								src/BaseGui.hpp
+								src/BaseGui.cpp
 								src/FirstGui.hpp
 								src/FirstGui.cpp)
 
@@ -28,10 +30,13 @@ source_group(src FILES ${gui_factory_SOURCES})
 #--------------------------------------------------------------------------
 # External Libraries
 #--------------------------------------------------------------------------
-list(APPEND gui_factory_LIBRARIES 
-						 ImGui-SFML::ImGui-SFML 
-						 SFML::Graphics
-						 )
+list(APPEND gui_factory_LIBRARIES
+#OWN
+	actor-factory
+#EXTERNAL
+	ImGui-SFML::ImGui-SFML 
+	SFML::Graphics
+)
 
 target_link_libraries(${TARGET_NAME} ${gui_factory_LIBRARIES})
 

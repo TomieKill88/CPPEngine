@@ -11,6 +11,7 @@
 #include "src/engine.hpp"
 #include "src/ConfigFileReader.hpp"
 #include "src/CustomShape.hpp"
+#include "src/FirstGui.hpp"
 
 /*
 #include <windows.h>
@@ -81,6 +82,7 @@ int main(int argc, char* argv[])
     if (!ImGui::SFML::Init(window))
         return -1;
 
+    CustomGui::FirstGui tst(shapes);
 
     sf::Clock clock;
     while (window.isOpen())
@@ -100,9 +102,9 @@ int main(int argc, char* argv[])
         ImGui::SFML::Update(window, clock.restart());
 
         ////////// GUI ELEMENTS ///////////
-        ImGui::Begin("Shape Controller");       
-
-        ImGui::End();
+        //ImGui::Begin("Shape Controller");       
+        tst.update();
+        //ImGui::End();
 
         
         ////////// Clear window ///////////
