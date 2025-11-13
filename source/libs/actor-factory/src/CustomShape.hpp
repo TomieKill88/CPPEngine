@@ -64,6 +64,7 @@ namespace CShape
 		void setScale(const float scale);
 
 		std::string getLabel();
+		float getScale();
 		sf::Vector2f getVelocity();
 		sf::Color getColor();
 

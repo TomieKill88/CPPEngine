@@ -95,6 +95,11 @@ namespace CShape
 		return currentData.label;
 	}
 
+	float CustomShape::getScale()
+	{
+		return currentData.scale;
+	}
+
 	sf::Vector2f CustomShape::getVelocity()
 	{
 		sf::Vector2f vel;

@@ -36,6 +36,7 @@ namespace CustomGui
 				ImGui::Checkbox("Draw Figure", &drawFigure);
 				currentShapeSelected->enable(drawFigure);
 
+				scale = currentShapeSelected->getScale();
 				ImGui::SliderFloat("Scale", &scale, 0.0f, 5.0f, "%.2f");
 				currentShapeSelected->setScale(scale);								
 				
@@ -44,11 +45,13 @@ namespace CustomGui
 				ImGui::InputFloat2("Velocity", vel, "%.1f");
 				currentShapeSelected->setVelocity({vel[0], vel[1]});
 
-
 				sf::Color tmpc = currentShapeSelected->getColor();
 				color[0] = tmpc.r; color[1] = tmpc.g; color[2] = tmpc.b;
 				ImGui::InputInt3("Color", color);
 				currentShapeSelected->setColor(color[0], color[1], color[2]);
+
+				if (ImGui::Button("Reset"))
+					currentShapeSelected->reset();
 
 				end();
 			}
