@@ -95,6 +95,24 @@ namespace CShape
 		return currentData.label;
 	}
 
+	sf::Vector2f CustomShape::getVelocity()
+	{
+		sf::Vector2f vel;
+		vel.x = currentData.velX;
+		vel.y = currentData.velY;
+		return vel;
+	}
+
+	sf::Color CustomShape::getColor()
+	{
+		sf::Color col;
+		col.r = currentData.r;
+		col.g = currentData.g;
+		col.b = currentData.b;
+
+		return col;
+	}
+
 	void CustomShape::reset()
 	{
 		setLabel(initialData.label);

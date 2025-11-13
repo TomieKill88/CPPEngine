@@ -20,6 +20,11 @@ namespace CustomGui
 		std::string names = "";
 		// Combo selection data index
 		int currentShapeIndex = 0;
+		// Options
+		bool drawFigure = true;
+		float scale = 1.0f;
+		float vel[2];
+		int color[3];
 
 	public:
 
