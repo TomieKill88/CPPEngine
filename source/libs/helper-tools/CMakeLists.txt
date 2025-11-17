@@ -10,7 +10,9 @@ add_library(${TARGET_NAME} STATIC)
 #--------------------------------------------------------------------------
 list(APPEND helper-tools_SOURCES  # sources
 								src/ConfigFileReader.hpp
-								src/ConfigFileReader.cpp)
+								src/ConfigFileReader.cpp
+								src/Vec2.hpp
+								src/Vec2.cpp)
 
 target_sources(${TARGET_NAME} PRIVATE ${helper-tools_SOURCES})
 
