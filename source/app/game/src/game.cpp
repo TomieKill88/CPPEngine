@@ -8,10 +8,15 @@
 #include <imgui-SFML.h>
 #include <imgui.h>
 
-#include "src/engine.hpp"
+
+#include "src/Actor.hpp"
+#include "src/ActorType.hpp"
 #include "src/ConfigFileReader.hpp"
 #include "src/CustomShape.hpp"
+#include "src/CTransform.hpp"
+#include "src/engine.hpp"
 #include "src/FirstGui.hpp"
+#include "src/Vec2.hpp"
 
 /*
 #include <windows.h>
@@ -25,7 +30,7 @@ std::string ExePath() {
 void init(std::string& fileName, sf::RenderWindow& window, sf::Font& font, std::vector<std::shared_ptr<CShape::CustomShape>>& shapes)
 {
     std::vector<std::vector<std::string>> configData;
-    ConfigFileReader::getFileTokens(fileName, configData);
+    Tools::getFileTokens(fileName, configData);
     if(configData.size() < 3)
         throw std::invalid_argument("Error. Not enough arguments in config file.");
 
@@ -63,6 +68,17 @@ int main(int argc, char* argv[])
     //std::cout << "my directory is " << ExePath() << "\n";
 
     //callWindowTest();
+    Actor::Actor actorTest(Actor::ActorTypeEnum::PLAYER);
+    std::cout << "New Actor: " << actorTest.getTagString() << " IdNr: " << actorTest.getId() << std::endl;
+    if (!actorTest.has<Component::CTransform>())
+    {
+        Tools::Vec2 pos(5,6);
+        Tools::Vec2 vel(5, 6);
+
+        auto componentAdded = actorTest.add<Component::CTransform>(pos, vel);
+    }
+    if (actorTest.has<Component::CTransform>())
+        std::cout << "CTranform added" << std::endl;
 
     std::string fileName = "config/config.txt";
     sf::RenderWindow window;

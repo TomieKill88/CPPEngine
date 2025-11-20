@@ -27,7 +27,7 @@ namespace CShape
 
 		float scale;
 	};
-
+	
 	class CustomShape
 	{
 	private:

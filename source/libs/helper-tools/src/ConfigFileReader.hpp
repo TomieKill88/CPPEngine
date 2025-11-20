@@ -3,7 +3,7 @@
 #include <vector>
 #include <string>
 
-namespace ConfigFileReader
+namespace Tools
 {
 	void readFile(std::string& fileName, std::vector<std::string>& lines);
 

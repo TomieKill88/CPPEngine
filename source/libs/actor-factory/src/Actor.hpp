@@ -1,0 +1,74 @@
+#pragma once
+
+#include <iostream>
+#include <string>
+#include <memory>
+
+#include <SFML/Graphics.hpp>
+
+#include "ActorType.hpp"
+#include "src/CTransform.hpp"
+
+namespace Actor
+{	
+	typedef std::tuple<Component::CTransform> ComponentTuple;
+
+	class Actor
+	{
+	private:
+
+		ActorType tag;
+
+		size_t id = 0;
+
+		ComponentTuple mComponents;
+
+		bool mAlive = false;
+
+
+	public:
+
+		Actor() = default;
+		Actor(ActorTypeEnum actorType);
+		virtual ~Actor() = default;
+
+		bool isAlive() const;
+		size_t getId() const;
+		ActorTypeEnum getTag();
+		std::string getTagString();
+
+		void destroy();
+
+
+		template<typename T>
+		T& get()
+		{
+			return std::get<T>(mComponents);
+		}
+		template<typename T>
+		const T& get() const
+		{
+			return std::get<T>(mComponents);
+		}
+		template<typename T>
+		bool has()
+		{
+			return get<T>().exists;
+		}
+		template<typename T, typename... TArgs>
+		T& add(TArgs&&... compArgs)
+		{
+			auto &component = get<T>();
+			
+			component = T(std::forward<TArgs>(compArgs)...);
+			component.exists = true;
+
+			return component;
+		}
+		template<typename T>
+		void remove()
+		{
+			get<T>() = T();
+		}
+	};
+}

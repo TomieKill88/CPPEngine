@@ -1,6 +1,6 @@
 #include "Vec2.hpp"
 
-namespace Linear
+namespace Tools
 {	
 	Vec2::Vec2(float xin, float yin) : x(xin), y(yin) {}
 

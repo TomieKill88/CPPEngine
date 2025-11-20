@@ -18,10 +18,11 @@ target_sources(${TARGET_NAME} PRIVATE ${game_SOURCES})
 #--------------------------------------------------------------------------
 list(APPEND game_LIB_SOURCES 
 #OWN
-	engine
-	helper-tools
 	actor-factory
+	component-factory
+	engine
 	gui-factory
+	helper-tools
 #EXTERNAL
 	ImGui-SFML::ImGui-SFML 
 	SFML::Graphics

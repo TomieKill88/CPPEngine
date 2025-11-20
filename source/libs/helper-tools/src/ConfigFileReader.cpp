@@ -5,7 +5,7 @@
 #include "ConfigFileReader.hpp"
 
 
-namespace ConfigFileReader
+namespace Tools
 {
 	void readFile(std::string& fileName, std::vector<std::string>& lines)
 	{

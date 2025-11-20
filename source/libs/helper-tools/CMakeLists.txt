@@ -11,6 +11,7 @@ add_library(${TARGET_NAME} STATIC)
 list(APPEND helper-tools_SOURCES  # sources
 								src/ConfigFileReader.hpp
 								src/ConfigFileReader.cpp
+								src/SmartEnum.hpp
 								src/Vec2.hpp
 								src/Vec2.cpp)
 
@@ -41,9 +42,9 @@ install(TARGETS ${TARGET_NAME}
 		)
 
 # Only for public libraries that will be used by the app
-list(APPEND helper-tools_PUBLIC_LIBS  #LIBRARIES
-							src/ConfigFileReader.hpp
-							)
+#list(APPEND helper-tools_PUBLIC_LIBS  #LIBRARIES
+#							src/ConfigFileReader.hpp
+#							)
 
 #install(FILES ${sfml_PUBLIC_LIBS}
 #		DESTINATION ${INSTALL_INCLUDEDIR}

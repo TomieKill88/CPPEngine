@@ -1,6 +1,6 @@
 #pragma once
 
-namespace Linear
+namespace Tools
 {
 	class Vec2
 	{
