@@ -9,6 +9,8 @@ add_executable(${TARGET_NAME})
 # Sources
 #--------------------------------------------------------------------------
 list(APPEND game_SOURCES  #sources
+						src/main.cpp
+						src/game.hpp
 						src/game.cpp)
 
 target_sources(${TARGET_NAME} PRIVATE ${game_SOURCES})
