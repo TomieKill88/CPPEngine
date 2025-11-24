@@ -2,9 +2,10 @@
 
 namespace Actor
 {
-	Actor::Actor(ActorTypeEnum actorType)
+	Actor::Actor(ActorTypeEnum actorType, size_t id)
 	{
 		tag.setEnum(actorType);
+		this->id = id;
 		mAlive = true;
 	}
 

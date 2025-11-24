@@ -10,7 +10,9 @@ namespace Actor
 
 	ActorPtr ActorManager::createActor(ActorTypeEnum actorType)
 	{ 
-		std::shared_ptr<Actor> newActor = std::make_shared<Actor>(actorType, createdActors++);
+		// Because the Ator onstructor is private, we can't use make_shared when creating the new Actor
+		// we need to create the raw pointer and wrap it.
+		std::shared_ptr<Actor> newActor = std::shared_ptr<Actor>(new Actor(actorType, createdActors++));
 		mToAdd.push_back(newActor);
 		return newActor;
 	}
@@ -43,17 +45,7 @@ namespace Actor
 
 	void ActorManager::update()
 	{		
-		for (auto actor : mToAdd)
-		{
-			mActiveActors.push_back(actor);
-			mActorsPerType[actor->getTag()].push_back(actor);
-		}
-
-		mToAdd.clear();
-	}
-
-	void ActorManager::destroy()
-	{ 
+		// Destroy all marked Actors
 		for (auto it = mActiveActors.begin(); it != mActiveActors.end(); ++it)
 		{
 			if (!(*it)->isAlive())
@@ -65,7 +57,7 @@ namespace Actor
 		}
 		for (auto& mapEntry : mActorsPerType)
 		{
-			ActorVector actorGroup = mapEntry.second;
+			ActorVector& actorGroup = mapEntry.second;
 
 			for (auto it = actorGroup.begin(); it != actorGroup.end(); ++it)
 			{
@@ -77,5 +69,14 @@ namespace Actor
 					break;
 			}
 		}
+
+		//Add all new actors
+		for (auto actor : mToAdd)
+		{
+			mActiveActors.push_back(actor);
+			mActorsPerType[actor->getTag()].push_back(actor);
+		}
+
+		mToAdd.clear();
 	}
 }

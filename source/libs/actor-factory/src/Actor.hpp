@@ -11,10 +11,13 @@
 
 namespace Actor
 {	
+	class ActorManager;
+
 	typedef std::tuple<Component::CTransform> ComponentTuple;
 
 	class Actor
 	{
+		friend class ActorManager;
 	private:
 
 		ActorType tag;
@@ -25,11 +28,11 @@ namespace Actor
 
 		bool mAlive = false;
 
+		Actor() = default;
+		Actor(ActorTypeEnum actorType, size_t id);	public:
 
 	public:
 
-		Actor() = default;
-		Actor(ActorTypeEnum actorType);
 		virtual ~Actor() = default;
 
 		bool isAlive() const;
@@ -39,7 +42,7 @@ namespace Actor
 
 		void destroy();
 
-
+		// COMPONENTS
 		template<typename T>
 		T& get()
 		{

@@ -19,8 +19,6 @@ namespace Actor
 		ActorVector mToAdd;
 		std::map<ActorTypeEnum, ActorVector> mActorsPerType;
 
-		
-
 	public:
 
 		size_t createdActors = 0;
@@ -34,6 +32,5 @@ namespace Actor
 		ActorVector& getAllActors();
 		ActorPtr getActor(ActorTypeEnum actorType, int actorId);
 		void update();
-		void destroy();
 	};
 }

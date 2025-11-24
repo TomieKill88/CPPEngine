@@ -13,6 +13,8 @@ list(APPEND actor_factory_SOURCES  # sources
 								src/ActorType.cpp
 								src/Actor.hpp
 								src/Actor.cpp
+								src/ActorManager.hpp
+								src/ActorManager.cpp
 								src/CustomShape.hpp
 								src/CustomShape.cpp)
 
