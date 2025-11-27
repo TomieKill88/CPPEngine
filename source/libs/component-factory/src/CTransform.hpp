@@ -14,11 +14,13 @@ namespace Component
 
 	public:
 
-		Tools::Vec2 position = { 0.0f, 0.0f };
-		Tools::Vec2 speed = { 0.0f, 0.0f };
+		Tools::Vec2<float> position = { 0.0f, 0.0f };
+		Tools::Vec2<float> speed = { 0.0f, 0.0f };
+		Tools::Vec2<float> scale = { 1.0f, 1.0f };
+		float angle = 0.0f;
 
 		CTransform() = default;
-		CTransform(const Tools::Vec2& pPosition, const Tools::Vec2& pSpeed);
+		CTransform(const Tools::Vec2<float>& pPosition, const Tools::Vec2<float>& pSpeed, const Tools::Vec2<float>& pScale, float pAngle);
 
 		virtual ~CTransform() = default;
 	};

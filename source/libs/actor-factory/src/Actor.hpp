@@ -8,12 +8,25 @@
 
 #include "ActorType.hpp"
 #include "src/CTransform.hpp"
+#include "src/CInput.hpp"
+#include "src/CLifeSpawn.hpp"
+#include "src/CScore.hpp"
+#include "src/CCollision.hpp"
+#include "src/CColor.hpp"
+#include "src/CShape.hpp"
 
 namespace Actor
 {	
 	class ActorManager;
 
-	typedef std::tuple<Component::CTransform> ComponentTuple;
+	typedef std::tuple<Component::CShape, 
+						Component::CTransform, 
+						Component::CColor, 
+						Component::CInput, 
+						Component::CCollision, 
+						Component::CLifeSpawn, 
+						Component::CScore> 
+		ComponentTuple;
 
 	class Actor
 	{

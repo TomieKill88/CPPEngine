@@ -10,6 +10,18 @@ add_library(${TARGET_NAME} STATIC)
 #--------------------------------------------------------------------------
 list(APPEND component_factory_SOURCES  # sources
 								src/Component.hpp
+								src/CCollision.hpp
+								src/CCollision.cpp
+								src/CColor.hpp
+								src/CColor.cpp								
+								src/CInput.hpp
+								src/CInput.cpp
+								src/CScore.hpp
+								src/CScore.cpp
+								src/CShape.hpp
+								src/CShape.cpp								
+								src/CLifeSpawn.hpp
+								src/CLifeSpawn.cpp
 								src/CTransform.hpp
 								src/CTransform.cpp)
 
@@ -30,6 +42,7 @@ source_group(src FILES ${component_factory_SOURCES})
 # Add Libraries
 #--------------------------------------------------------------------------
 list(APPEND component_factory_LIBRARIES 
+						 SFML::Graphics
 						 helper-tools
 						 )
 
