@@ -45,7 +45,7 @@ void callWindowTest()
         return;
     
     sf::CircleShape shape(100.f);
-
+    
 
     shape.setFillColor(sf::Color::Green);
     float speedX = 1.0f;

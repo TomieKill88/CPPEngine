@@ -2,8 +2,6 @@
 
 namespace Tools
 {	
-	Vec2::Vec2(float xin, float yin) : x(xin), y(yin) {}
-
 	void Vec2::add(const Vec2& other)
 	{
 		x += other.x;

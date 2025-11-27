@@ -12,8 +12,7 @@ list(APPEND helper-tools_SOURCES  # sources
 								src/ConfigFileReader.hpp
 								src/ConfigFileReader.cpp
 								src/SmartEnum.hpp
-								src/Vec2.hpp
-								src/Vec2.cpp)
+								src/Vec2.hpp)
 
 target_sources(${TARGET_NAME} PRIVATE ${helper-tools_SOURCES})
 
@@ -30,8 +29,11 @@ target_include_directories(${TARGET_NAME} INTERFACE ${CMAKE_CURRENT_SOURCE_DIR})
 source_group(src FILES ${helper-tools_SOURCES})
 
 #--------------------------------------------------------------------------
-# External Libraries
+# Add Libraries
 #--------------------------------------------------------------------------
+list(APPEND component_factory_LIBRARIES 
+						 SFML::Graphics
+						 )
 
 
 #--------------------------------------------------------------------------
