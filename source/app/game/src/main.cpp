@@ -13,6 +13,7 @@
 #include "src/engine.hpp"
 #include "src/FirstGui.hpp"
 #include "src/Vec2.hpp"
+#include "src/BasicTools.hpp"
 
 #include "src/CTransform.hpp"
 #include "src/CInput.hpp"
@@ -25,6 +26,23 @@
 
 int main(int argc, char* argv[])
 {
+	Tools::seed();
+
+	std::cout << Tools::getRandomFloat(6.0, 20.0f) << std::endl;
+	std::cout << Tools::getRandomFloat(6.0, 20.0f) << std::endl;
+	std::cout << Tools::getRandomFloat(6.0, 20.0f) << std::endl;
+	std::cout << Tools::getRandomFloat(6.0, 20.0f) << std::endl;
+	std::cout << Tools::getRandomFloat(6.0, 20.0f) << std::endl;
+	std::cout << Tools::getRandomFloat(6.0, 20.0f) << std::endl;
+
+	std::cout << Tools::getRandomInt(2, 7) << std::endl;
+	std::cout << Tools::getRandomInt(2, 7) << std::endl;
+	std::cout << Tools::getRandomInt(2, 7) << std::endl;
+	std::cout << Tools::getRandomInt(2, 7) << std::endl;
+	std::cout << Tools::getRandomInt(2, 7) << std::endl;
+	std::cout << Tools::getRandomInt(2, 7) << std::endl;
+
+
 	Tools::Vec2f test(sf::Vector2f(4.5, 6.7));
 
 	Tools::Vec2f normal = test.normalized();

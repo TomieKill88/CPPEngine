@@ -9,11 +9,9 @@
 #include <imgui.h>
 
 #include "Game.hpp"
-#include "src/Actor.hpp"
 #include "src/ActorType.hpp"
+#include "src/BasicTools.hpp"
 #include "src/ConfigFileReader.hpp"
-#include "src/CustomShape.hpp"
-#include "src/CTransform.hpp"
 #include "src/engine.hpp"
 #include "src/FirstGui.hpp"
 #include "src/Vec2.hpp"
@@ -26,6 +24,71 @@ std::string ExePath() {
     return std::string(buffer);
 }
 */
+
+void Game::spawnPlayer()
+{
+    if (player)
+    {
+        std::cout << "Player already created;";
+        return;
+    }
+        
+    player = actorManager.createActor(Actor::ActorTypeEnum::PLAYER);
+    player->add<Component::CShape>(playerData.radius, playerData.fillColor, playerData.outlineColor, playerData.lineThickness, playerData.vertices);
+    player->add<Component::CTransform>(Tools::Vec2f{0.0, 0.0}, Tools::Vec2f{playerData.speed, playerData.speed}, Tools::Vec2f{ 1.0, 1.0 }, 10.0);
+    player->add<Component::CCollision>(playerData.collisionRadius);
+    player->add<Component::CInput>();
+    player->add<Component::CScore>();
+}
+
+void Game::spawnEnemy()
+{
+    Actor::ActorPtr tmpEnemy = actorManager.createActor(Actor::ActorTypeEnum::ENEMY);
+    tmpEnemy->add<Component::CShape>(enemyData.radius, sf::Color::Black, enemyData.outlineColor, enemyData.lineThickness, enemyData.maxVertices);
+    tmpEnemy->add<Component::CTransform>(Tools::Vec2f{ Tools::getRandomFloat(10.0, 200), Tools::getRandomFloat(10.0, 200) }, Tools::Vec2f{ Tools::getRandomFloat(1.0, enemyData.maxSpeed), Tools::getRandomFloat(1.0, enemyData.maxSpeed) }, Tools::Vec2f{ 1.0, 1.0 }, 10.0);
+    tmpEnemy->add<Component::CCollision>(enemyData.collisionRadius);
+}
+
+void Game::spawnBullet()
+{
+    Actor::ActorPtr tmpBullet = actorManager.createActor(Actor::ActorTypeEnum::BULLET);
+    tmpBullet->add<Component::CShape>(bulletData.radius, bulletData.fillColor, bulletData.fillColor, 0, bulletData.vertices);
+
+    auto pos = player->get<Component::CShape>();
+    tmpBullet->add<Component::CTransform>(Tools::Vec2f{pos.shape.getPosition()}, Tools::Vec2f(bulletData.speed, bulletData.speed), Tools::Vec2f{ 1.0, 1.0 }, 0.0);
+    tmpBullet->add<Component::CCollision>(bulletData.collisionRadius);
+    tmpBullet->add<Component::CLifeSpawn>(bulletData.lifeSpan);
+}
+
+void Game::init(std::string& fileName)
+{
+    Tools::seed();
+
+    playerData.radius = 5;
+    playerData.collisionRadius = 5;
+    playerData.speed = 5.0;
+    playerData.fillColor = sf::Color(0, 0, 255);
+    playerData.outlineColor = sf::Color(255, 255, 255);
+    playerData.lineThickness = 1;
+    playerData.vertices = 10;
+
+    enemyData.radius = 5;
+    enemyData.collisionRadius = 5;
+    enemyData.minSpeed = 3.0;
+    enemyData.maxSpeed = 8.0;
+    enemyData.outlineColor = sf::Color(255, 0, 0);
+    enemyData.lineThickness = 2;
+    enemyData.maxVertices = 6;
+    enemyData.lifeSpan = 5;
+    enemyData.spawnInterval = 30;
+    
+    bulletData.radius = 1;
+    bulletData.collisionRadius = 1;
+    bulletData.speed = 4.0f;
+    bulletData.fillColor = sf::Color(255, 255, 255);
+    bulletData.vertices = 8;
+    bulletData.lifeSpan = 600;
+}
 
 void Game::init(std::string& fileName, sf::RenderWindow& window, sf::Font& font, std::vector<std::shared_ptr<CShape::CustomShape>>& shapes)
 {

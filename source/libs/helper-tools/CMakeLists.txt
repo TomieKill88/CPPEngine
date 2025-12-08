@@ -9,6 +9,8 @@ add_library(${TARGET_NAME} STATIC)
 # Sources
 #--------------------------------------------------------------------------
 list(APPEND helper-tools_SOURCES  # sources
+								src/BasicTools.hpp
+								src/BasicTools.cpp
 								src/ConfigFileReader.hpp
 								src/ConfigFileReader.cpp
 								src/SmartEnum.hpp
