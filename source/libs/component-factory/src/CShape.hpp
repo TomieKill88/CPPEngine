@@ -14,7 +14,7 @@ namespace Component
 		sf::CircleShape shape;
 
 		CShape() = default;
-		CShape(float radius, sf::Color& color, size_t pointCount);
+		CShape(float radius, sf::Color color, sf::Color lineColor, int lineThickness, size_t pointCount);
 
 		virtual ~CShape() = default;
 	};

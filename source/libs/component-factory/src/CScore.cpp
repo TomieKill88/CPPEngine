@@ -4,6 +4,5 @@ namespace Component
 {
 	CScore::CScore(int pScore) : score(pScore)
 	{
-		exists = true;
 	}
 }
