@@ -1,5 +1,8 @@
 #include <string>
 
+#include <imgui-SFML.h>
+#include <imgui.h>
+
 #include "FirstGui.hpp"
 
 namespace CustomGui

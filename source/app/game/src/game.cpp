@@ -14,6 +14,7 @@
 #include "src/ConfigFileReader.hpp"
 #include "src/engine.hpp"
 #include "src/FirstGui.hpp"
+#include "src/GeoWarsGUI.hpp"
 #include "src/Vec2.hpp"
 
 /*
@@ -60,7 +61,7 @@ void Game::spawnBullet()
     tmpBullet->add<Component::CLifeSpawn>(bulletData.lifeSpan);
 }
 
-void Game::init(std::string& fileName)
+void Game::readConfiguration(std::string& fileName)
 {
     Tools::seed();
 
@@ -90,43 +91,95 @@ void Game::init(std::string& fileName)
     bulletData.lifeSpan = 600;
 }
 
-void Game::init(std::string& fileName, sf::RenderWindow& window, sf::Font& font, std::vector<std::shared_ptr<CShape::CustomShape>>& shapes)
+void Game::init(std::string& fileName)
 {
-    std::vector<std::vector<std::string>> configData;
+    /*std::vector<std::vector<std::string>> configData;
     Tools::getFileTokens(fileName, configData);
     if(configData.size() < 3)
-        throw std::invalid_argument("Error. Not enough arguments in config file.");
+        throw std::invalid_argument("Error. Not enough arguments in config file.");*/
+
+    readConfiguration(fileName);
+
+    uint32_t screenWidth = 640;
+    uint32_t screenHeight = 480;
+    window = sf::RenderWindow(sf::VideoMode({ screenWidth, screenHeight }), "HW2: Geometry wars");
 
 
-    if (configData[0][0] != "Window")
-        throw std::invalid_argument("Error. Window data should be at start of config file.");
-    uint32_t screenWidth = 0;
-    uint32_t screenHeight = 0;
-    try
-    {
-        screenWidth = std::stoi(configData[0][1]);
-        screenHeight = std::stoi(configData[0][2]);
-    }
-    catch (std::exception& ex)
-    {
-        std::cout << ex.what();
-        throw std::invalid_argument("Error. Non valid Window arguments");
-    }
-    window = sf::RenderWindow(sf::VideoMode({ screenWidth, screenHeight }), "CMake SFML Project");
-
-
-    if (configData[1][0] != "Fonts")
-        throw std::invalid_argument("Error. Fonts data should be second on config file.");
-    if (!font.openFromFile(configData[1][1]))
+    // Load Assets
+    if (!font.openFromFile("resources/AovelSans.ttf"))
         throw std::invalid_argument("Error. Non valid Font arguments");
 
-    for (int i = 2; i <= configData.size() - 1; ++i)
-    {
-        shapes.push_back(std::make_shared<CShape::CustomShape>(configData[i], font));
-    }
 }
 
 int Game::start()
+{
+    window.setFramerateLimit(144);
+    window.setKeyRepeatEnabled(false);
+    if (!ImGui::SFML::Init(window))
+        return -1;
+
+    CustomGui::GeoWarsGUI gui(actorManager);
+
+    sf::Clock clock;
+    while (window.isOpen())
+    {
+        ////////// EVENTS ///////////
+        while (const std::optional event = window.pollEvent())
+        {
+            ImGui::SFML::ProcessEvent(window, *event);
+
+            if (event->is<sf::Event::Closed>())
+            {
+                window.close();
+            }
+        }
+
+        // You must create all widgets between ImGui::SFML::Update() and ImGui::Render()
+        ImGui::SFML::Update(window, clock.restart());
+
+        ////////// GUI ELEMENTS ///////////     
+        gui.update();
+
+
+        ////////// Clear window ///////////
+        window.clear();
+
+        ////////// PHYSICS ///////////
+        /*for (auto shape : shapes)
+        {
+            if (shape->isEnabled())
+            {
+                shape->checkCollisionWindow(window);
+                shape->update();
+                shape->draw(window);
+            }
+        }*/
+
+        ////////// DRAW CHARACTERS ///////////
+
+        // Draw GUI Elements AFTER SFML so they overlap correctly
+        //Don’t call ImGui::Render, only call ImGui::SFML::Render
+        ImGui::SFML::Render(window);
+
+        window.display();
+    }
+
+    ImGui::SFML::Shutdown();
+
+    return 0;
+}
+
+sf::RenderWindow& Game::getWindow()
+{
+    return window;
+}
+
+Actor::ActorManager& Game::getActorManager()
+{ 
+    return actorManager;
+}
+
+/*int Game::start_OLD()
 {
     //std::cout << "my directory is " << ExePath() << "\n";
 
@@ -138,7 +191,7 @@ int Game::start()
     std::vector<std::shared_ptr<CShape::CustomShape>> shapes;
     try
     {
-        init(fileName, window, font, shapes);
+        //init(fileName, window, font, shapes);
     }
     catch (std::exception& ex)
     {
@@ -201,4 +254,4 @@ int Game::start()
     ImGui::SFML::Shutdown();
 
     return 0;
-}
+}*/

@@ -42,6 +42,11 @@ class Game
 	};
 
 private:
+	
+	sf::RenderWindow window;
+
+	// Assets
+	sf::Font font;
 
 	PlayerData playerData;
 	EnemyData enemyData;
@@ -50,18 +55,29 @@ private:
 	Actor::ActorManager actorManager;
 	Actor::ActorPtr player = nullptr;
 
+	void readConfiguration(std::string& fileName);
 	void spawnPlayer();
 	void spawnEnemy();
 	void spawnBullet();
 
+	// SYSTEM
+	void sUserInput();
+	void sRender();
+	void sMovement();
+	void sPhysics();
+
 public:
 
 	Game() = default;
-	~Game() = default;
+	~Game() = default;	
 
 	void init(std::string& fileName);
 
-	void init(std::string& fileName, sf::RenderWindow& window, sf::Font& font, std::vector<std::shared_ptr<CShape::CustomShape>>& shapes);
-
 	int start();
+
+	sf::RenderWindow& getWindow();
+
+	Actor::ActorManager& getActorManager();
+
+	//int start_OLD();
 };

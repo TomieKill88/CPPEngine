@@ -12,7 +12,9 @@ list(APPEND gui_factory_SOURCES  # sources
 								src/BaseGui.hpp
 								src/BaseGui.cpp
 								src/FirstGui.hpp
-								src/FirstGui.cpp)
+								src/FirstGui.cpp
+								src/GeoWarsGUI.hpp
+								src/GeoWarsGUI.cpp)
 
 target_sources(${TARGET_NAME} PRIVATE ${gui_factory_SOURCES})
 
