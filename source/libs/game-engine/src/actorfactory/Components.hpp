@@ -55,10 +55,9 @@ namespace Components
 
 	class CShape : public Component
 	{
-		sf::Font mFont;
 	public:
-
 		sf::CircleShape mShape;
+		sf::Font mFont;
 		sf::Text mLabel;
 
 		CShape();

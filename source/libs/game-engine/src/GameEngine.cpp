@@ -74,11 +74,13 @@ namespace GameEngine
                 // set shape label
                 componentShape.mLabel.setString(sf::String(shapes[i]["label"].get<std::string>()));
                 componentShape.mLabel.setOrigin(componentShape.mLabel.getLocalBounds().getCenter());
+                // MUST set Font here or else the reference is lost for some reason
+                componentShape.mLabel.setFont(componentShape.mFont);
 
                 // set shape color
                 componentShape.mShape.setFillColor(sf::Color(shapes[i]["r"].get<int>(), 
                                                              shapes[i]["g"].get<int>(), 
-                                                             shapes[i]["b"].get<int>()));
+                                                             shapes[i]["b"].get<int>()));                
                   
                 mActorPool.push_back(actor);
             }           
@@ -126,10 +128,10 @@ namespace GameEngine
         //mScenes[mCurrentScene].render();
         for each (auto & actor in mActorPool)
         {
-            auto shape = actor->get<Components::CShape>();
+            auto &shape = actor->get<Components::CShape>();
 
             mWindow.draw(shape.mShape);
-            //mWindow.draw(shape.mLabel);
+            mWindow.draw(shape.mLabel);
         }
 
         // Dra GUI Elements AFTER SFML so they overlap correctly
