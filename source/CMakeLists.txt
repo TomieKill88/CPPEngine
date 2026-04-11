@@ -23,6 +23,9 @@ include(imgui)
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_LIST_DIR}/cmake/dependencies/imgui-sfml)
 include(imgui-sfml)
 
+list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_LIST_DIR}/cmake/dependencies/nlohmann)
+include(nlohmann)
+
 # Libraries and applications
 add_subdirectory(app)
 add_subdirectory(libs)
@@ -43,7 +46,7 @@ list(APPEND resources  resources/AovelSans.ttf)
 # Config
 #--------------------------------------------------------------------------						
 
-list(APPEND config  app/config/config.txt)						
+list(APPEND config  app/config/appconfig.json)						
 
 #--------------------------------------------------------------------------
 # Install

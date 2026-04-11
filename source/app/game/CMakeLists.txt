@@ -20,14 +20,12 @@ target_sources(${TARGET_NAME} PRIVATE ${game_SOURCES})
 #--------------------------------------------------------------------------
 list(APPEND game_LIB_SOURCES 
 #OWN
-	actor-factory
-	component-factory
-	engine
-	gui-factory
+	game-engine
 	helper-tools
 #EXTERNAL
 	ImGui-SFML::ImGui-SFML 
 	SFML::Graphics
+	nlohmann_json::nlohmann_json
 )
 
 target_link_libraries(${TARGET_NAME} PUBLIC ${game_LIB_SOURCES})
@@ -40,9 +38,14 @@ source_group(src FILES ${game_SOURCES})
 #--------------------------------------------------------------------------
 # Include Directories
 #--------------------------------------------------------------------------
-#target_include_directories(${TARGET_NAME} PUBLIC
-#							"${PROJECT_BINARY_DIR}"
-#							)
+target_include_directories(${TARGET_NAME} PUBLIC
+							"${PROJECT_BINARY_DIR}"
+							)
+
+# Add additional include directories.
+target_include_directories(${TARGET_NAME}
+	PRIVATE		${CMAKE_CURRENT_SOURCE_DIR}/src
+	)
 
 #--------------------------------------------------------------------------
 # Target Properties

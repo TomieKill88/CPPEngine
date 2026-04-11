@@ -1,0 +1,40 @@
+{  
+  "window": {
+    "width": 640,
+    "height": 480,
+    "framerate": 144
+  },
+  "fonts": [
+    "resources/AovelSans.ttf"
+  ],
+  "actors": {
+    "shapes": [
+      {
+        "type": "rectangle",
+        "label": "Recky",
+        "vertix": 4,
+        "x": 0.0,
+        "y": 0.0,
+        "vx": 10.0,
+        "vy": 20.0,
+        "r": 100,
+        "g": 100,
+        "b": 100,
+        "radius": 50.0
+      },
+      {
+        "type": "circle",
+        "label": "Circly",
+        "vertix": 20,
+        "x": 0.0,
+        "y": 0.0,
+        "vx": 5.0,
+        "vy": 15.0,
+        "r": 100,
+        "g": 100,
+        "b": 100,
+        "radius": 50.0
+      }
+    ]
+  }
+}
