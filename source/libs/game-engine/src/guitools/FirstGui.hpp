@@ -28,6 +28,11 @@ namespace GuiTools
 		float vel[2];
 		int color[3];
 
+		std::vector<size_t> mActiveActorsIndex;
+
+		void updateNames();
+		void updateNamesByType();
+
 	public:
 
 		FirstGui() = delete;

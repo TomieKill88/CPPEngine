@@ -4,29 +4,34 @@
 
 #include "guitools/FirstGui.hpp"
 #include "scenes/BaseScene.hpp"
+#include "actorfactory/ActorManager.hpp"
 #include "actorfactory/Actor.hpp"
 
 namespace GameEngine
 {
 	class GameEngine
 	{
+
+		// Scenes
 		std::map<std::string, Scene::BaseScene> mScenes;
 		std::string	mCurrentScene;
 
 		//Vector<assests>
+		
 		//Actions
+		
 		//GUIs
 		std::unique_ptr<GuiTools::FirstGui> mGuiTools;
+		
+		// SFML
 		sf::RenderWindow mWindow;
 		sf::Clock mClock;
 		bool mIsRunning = false;
 
-
-
 	public:
 
-		////// TEMP //////
-		std::vector<std::shared_ptr<Actor::Actor>> mActorPool;
+		// Actors
+		ActorManager::ActorManager mActorManager;
 
 		GameEngine();
 		~GameEngine() = default;

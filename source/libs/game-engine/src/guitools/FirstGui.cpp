@@ -16,13 +16,25 @@ namespace GuiTools
 	}
 	*/
 
-	FirstGui::FirstGui(GameEngine::GameEngine* gameEngineInterface) : BaseGui(gameEngineInterface) 
+	void FirstGui::updateNames()
 	{
-		for (auto actor : BaseGui::mGameEngineInterface->mActorPool)
+		mShapeNames = "";
+
+		mActiveActorsIndex = BaseGui::mGameEngineInterface->mActorManager.getAllActors();
+		for (auto active : mActiveActorsIndex)
 		{
+			auto& actor = BaseGui::mGameEngineInterface->mActorManager.getActor(active);
 			auto shape = actor->get<Components::CShape>();
 			mShapeNames += shape.mLabel.getString() + '\0';
 		}
+	}
+
+	void FirstGui::updateNamesByType()
+	{ }
+
+	FirstGui::FirstGui(GameEngine::GameEngine* gameEngineInterface) : BaseGui(gameEngineInterface) 
+	{
+		updateNames();
 	};
 
 	void FirstGui::update()
@@ -35,9 +47,10 @@ namespace GuiTools
 			}
 			else
 			{
+				updateNames();
 				ImGui::SeparatorText("Shape Selector");
 				ImGui::Combo("shapes", &currentShapeIndex, mShapeNames.c_str());
-				auto &currentShapeSelected = BaseGui::mGameEngineInterface->mActorPool[currentShapeIndex];
+				auto &currentShapeSelected = BaseGui::mGameEngineInterface->mActorManager.getActor(mActiveActorsIndex[currentShapeIndex]);
 				auto &selectedShape = currentShapeSelected->get<Components::CShape>();
 
 				//////////  Shape name  ///////////////

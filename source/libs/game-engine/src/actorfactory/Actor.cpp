@@ -10,6 +10,7 @@ namespace Actor
 	Actor::Actor(ActorTypeEnum actorType, size_t id) : id(id)
 	{
 		init(actorType);
+		removeAll();
 	}
 
 	void Actor::init(ActorTypeEnum actorType)
@@ -41,5 +42,15 @@ namespace Actor
 	void Actor::destroy()
 	{
 		mAlive = false;
-	}	
+	}
+
+	void Actor::removeAll()
+	{
+		remove<Components::CTransform>();
+		remove<Components::CCollision>();
+		remove<Components::CInput>();
+		remove<Components::CLifespan>();
+		remove<Components::CScore>();
+		remove<Components::CShape>();
+	}
 }

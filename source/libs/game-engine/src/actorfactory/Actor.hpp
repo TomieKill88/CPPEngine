@@ -10,10 +10,10 @@
 #include "Components.hpp"
 
 
-//namespace ActorManager
-//{
-//	class ActorManager;
-//}
+namespace ActorManager
+{
+	class ActorManager;
+}
 
 namespace Actor
 {	
@@ -27,7 +27,7 @@ namespace Actor
 
 	class Actor
 	{
-		//friend class ActorManager::ActorManager;
+		friend class ActorManager::ActorManager;
 	private:
 
 		ActorType tag;
@@ -38,15 +38,17 @@ namespace Actor
 
 		bool mAlive = false;
 
-
-
-	public:
-
 		// later private
 		Actor() = default;
 		Actor(size_t id);
 		Actor(ActorTypeEnum actorType, size_t id);
+
 		void init(ActorTypeEnum actorType);
+		void removeAll();
+		void destroy();
+
+	public:
+
 
 		virtual ~Actor() = default;
 
@@ -54,8 +56,6 @@ namespace Actor
 		size_t getId() const;
 		ActorTypeEnum getTag();
 		std::string getTagString();
-
-		void destroy();
 
 		// COMPONENTS
 		template<typename T>
@@ -87,11 +87,6 @@ namespace Actor
 		void remove()
 		{
 			get<T>() = T();
-		}
-		void removeAll()
-		{
-			//std::tuple<Components::CTransform>
-			get<Components::CTransform>() = Components::CTransform();
 		}
 	};
 }

@@ -51,7 +51,7 @@ namespace GameEngine
             mWindow.setFramerateLimit(j["window"]["framerate"].get<int>());
 
 
-            //TEMP
+            //Unique font for component labels
             sf::Font font;
             if (!font.openFromFile(j["fonts"][0].get<std::string>()))
                 std::cout << "ERROR opening font" << std::endl;
@@ -61,7 +61,7 @@ namespace GameEngine
 
             for (int i = 0; i < actors; i++)
             {
-                std::shared_ptr<Actor::Actor> actor = std::make_shared<Actor::Actor>(Actor::ActorTypeEnum::ENEMY, i);
+                auto actor = mActorManager.createActor(Actor::ActorTypeEnum::ENEMY);
                 
                 // set position and speed
                 actor->add<Components::CTransform>(Tools::Vec2(shapes[i]["x"].get<float>(), shapes[i]["y"].get<float>()), 
@@ -80,9 +80,7 @@ namespace GameEngine
                 // set shape color
                 componentShape.mShape.setFillColor(sf::Color(shapes[i]["r"].get<int>(), 
                                                              shapes[i]["g"].get<int>(), 
-                                                             shapes[i]["b"].get<int>()));                
-                  
-                mActorPool.push_back(actor);
+                                                             shapes[i]["b"].get<int>()));                  
             }           
         }
         catch (std::exception& e)
@@ -93,6 +91,9 @@ namespace GameEngine
 
     void GameEngine::update()
     {
+        // Update Actors
+        mActorManager.update();
+
         // ImGUI UPDATE
         ImGui::SFML::Update(mWindow, mClock.restart());
 
@@ -102,20 +103,26 @@ namespace GameEngine
         // Scene Update (systems)
         //mScenes[mCurrentScene].update();
         //////////  Wall collision  ///////////////
-        for each ( auto& actor in mActorPool)
+        auto activeActors = mActorManager.getAllActors();
+        for each ( auto& active in activeActors)
         {
-            auto &transform = actor->get<Components::CTransform>();
-            auto &shape = actor->get<Components::CShape>();
+            auto &actor = mActorManager.getActor(active);
 
-            shape.mShape.move(sf::Vector2f{ transform.speed.x, transform.speed.y });
-            auto shapeBounds = shape.mShape.getGlobalBounds();
-            auto shapeBoundSize = shapeBounds.size;
-            auto newPos = shape.mShape.getPosition();
-            if ((newPos.x + shapeBoundSize.x) > mWindow.getSize().x || newPos.x < 0.0f)
-                transform.speed.x *= -1;
-            if ((newPos.y + shapeBoundSize.y) > mWindow.getSize().y || newPos.y < 0.0f)
-                transform.speed.y *= -1;
-            shape.mLabel.setPosition(shape.mShape.getGlobalBounds().getCenter());
+            if (actor->isAlive())
+            {
+                auto& transform = actor->get<Components::CTransform>();
+                auto& shape = actor->get<Components::CShape>();
+
+                shape.mShape.move(sf::Vector2f{ transform.speed.x, transform.speed.y });
+                auto shapeBounds = shape.mShape.getGlobalBounds();
+                auto shapeBoundSize = shapeBounds.size;
+                auto newPos = shape.mShape.getPosition();
+                if ((newPos.x + shapeBoundSize.x) > mWindow.getSize().x || newPos.x < 0.0f)
+                    transform.speed.x *= -1;
+                if ((newPos.y + shapeBoundSize.y) > mWindow.getSize().y || newPos.y < 0.0f)
+                    transform.speed.y *= -1;
+                shape.mLabel.setPosition(shape.mShape.getGlobalBounds().getCenter());
+            }
         }        
     }
 
@@ -126,12 +133,17 @@ namespace GameEngine
 
         // Draw Scene (render)
         //mScenes[mCurrentScene].render();
-        for each (auto & actor in mActorPool)
+        auto activeActors = mActorManager.getAllActors();
+        for each (auto& active in activeActors)
         {
-            auto &shape = actor->get<Components::CShape>();
+            auto& actor = mActorManager.getActor(active);
+            if (actor->isAlive())
+            {
+                auto& shape = actor->get<Components::CShape>();
 
-            mWindow.draw(shape.mShape);
-            mWindow.draw(shape.mLabel);
+                mWindow.draw(shape.mShape);
+                mWindow.draw(shape.mLabel);
+            }
         }
 
         // Dra GUI Elements AFTER SFML so they overlap correctly

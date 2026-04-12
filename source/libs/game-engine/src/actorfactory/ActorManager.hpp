@@ -34,8 +34,9 @@ namespace ActorManager
 		ActorPtr createActor(Actor::ActorTypeEnum actorType);
 		void destroyActor(int actorId);
 		ActorVector& getActorsOfType(Actor::ActorTypeEnum actorType);
-		ActorVector& getAllActors();
+		const std::vector<size_t>& getAllActors() const;
 		ActorPtr getActor(Actor::ActorTypeEnum actorType, int actorId);
+		ActorPtr getActor(int actorId);
 		void update();
 	};
 }

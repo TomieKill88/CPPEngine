@@ -9,7 +9,7 @@ namespace ActorManager
 	ActorManager::ActorManager()
 	{
 		mActorPool.reserve(mActorAmount);
-		for (ActorVector::iterator it = mActorPool.begin(); it != mActorPool.end(); it++)
+		for (int i = 0; i < mActorAmount; i++)
 		{
 			// Because the Actor constructor is private, we can't use make_shared when creating the new Actor
 			// we need to create the raw pointer and wrap it.
@@ -17,7 +17,9 @@ namespace ActorManager
 		}
 
 		mFreeActors.reserve(mActorAmount);
-		std::iota(std::begin(mFreeActors), std::end(mFreeActors), 0);
+		//std::iota(mFreeActors.begin(), mFreeActors.end(), 0); not working for some reason
+		for (int i = 0; i < mActorAmount; i++)
+			mFreeActors.push_back(i);
 
 		mActiveActors.reserve(mActorAmount);
 		mToAdd.reserve(mActorAmount);
@@ -33,9 +35,9 @@ namespace ActorManager
 
 			std::shared_ptr<Actor::Actor> newActor = mActorPool[freeActorIndex];
 			newActor->init(actorType);
-			newActor->removeAll();
 
 			mToAdd.push_back(newActor->getId());
+
 			return newActor;
 		}
 
@@ -57,9 +59,9 @@ namespace ActorManager
 		return mActorsPerType[actorType];
 	}
 
-	ActorVector& ActorManager::getAllActors()
+	const std::vector<size_t>& ActorManager::getAllActors() const
 	{
-		return mActorPool;
+		return mActiveActors;
 	}
 
 	ActorPtr ActorManager::getActor(Actor::ActorTypeEnum actorType, int actorId)
@@ -68,7 +70,7 @@ namespace ActorManager
 
 		for (auto it = actorGroup.begin(); it != actorGroup.end(); ++it)
 		{
-			if (!(*it)->getId() == actorId)
+			if ((*it)->getId() == actorId)
 			{
 				return (*it);
 				break;
@@ -78,16 +80,37 @@ namespace ActorManager
 		return nullptr;
 	}
 
+	ActorPtr ActorManager::getActor(int actorId)
+	{ 
+		return mActorPool[actorId];
+	}
+
 	void ActorManager::update()
 	{		
 		// Remove destroyed
 		for (auto actor : mToDestroy)
 		{
 			// Remove from actives
-			auto it = std::find(mActiveActors.begin(), mActiveActors.end(), actor);
-			if (it != mActiveActors.end())
-				mActiveActors.erase(it);
+			auto actorToDeleteIndex = std::find(mActiveActors.begin(), mActiveActors.end(), actor);
+			if (actorToDeleteIndex != mActiveActors.end())
+			{
+				// Find the actor to delete in the pool
+				auto actorToDelete = mActorPool[*actorToDeleteIndex];
 
+				// Erase from Type dictionary
+				ActorVector& actorGroup = mActorsPerType[actorToDelete->getTag()];
+				for (auto it2 = actorGroup.begin(); it2 != actorGroup.end(); ++it2)
+				{
+					if ((*it2)->getId() == (*actorToDeleteIndex))
+					{
+						actorGroup.erase(it2);
+						break;
+					}
+				}
+
+				// Erase from list of active actors
+				mActiveActors.erase(actorToDeleteIndex);
+			}
 			// Add to free
 			mFreeActors.push_back(actor);
 		}
@@ -100,8 +123,6 @@ namespace ActorManager
 			mActiveActors.push_back(actor);
 			mActorsPerType[mActorPool[actor]->getTag()].push_back(mActorPool[actor]);
 		}
-		mToAdd.clear();
-
-		
+		mToAdd.clear();		
 	}
 }
