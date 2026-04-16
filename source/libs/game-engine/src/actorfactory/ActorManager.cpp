@@ -24,6 +24,7 @@ namespace ActorManager
 		mActiveActors.reserve(mActorAmount);
 		mToAdd.reserve(mActorAmount);
 		mToDestroy.reserve(mActorAmount);
+
 	}
 
 	ActorPtr ActorManager::createActor(Actor::ActorTypeEnum actorType)
@@ -56,10 +57,13 @@ namespace ActorManager
 
 	ActorVector& ActorManager::getActorsOfType(Actor::ActorTypeEnum actorType)
 	{
-		if (mActorsPerType.find(actorType) != mActorsPerType.end())
-			return mActorsPerType[actorType];
-		else
-			return ActorVector{};
+		if (mActorsPerType.find(actorType) == mActorsPerType.end())
+		{
+			mActorsPerType[actorType] = ActorVector{};
+			mActorsPerType[actorType].reserve(100);
+		}
+
+		return mActorsPerType[actorType];
 	}
 
 	const std::vector<size_t>& ActorManager::getAllActors() const

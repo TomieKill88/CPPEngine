@@ -144,6 +144,8 @@ namespace GameEngine
         
         // Scene Update (systems)
         //mScenes[mCurrentScene].update();
+        sEnemySpawner();
+
         auto activeActors = mActorManager.getAllActors();
         for each (auto & active in activeActors)
         {
@@ -339,15 +341,16 @@ namespace GameEngine
         {
             auto enemy = mActorManager.createActor(Actor::ActorTypeEnum::ENEMY);
             // +-50.0 so enemies don't spawn touching the borders
-            float x = random<float>(50.0f, (float)mWindowData.width / 2 - 50.0f);
-            float y = random<float>(50.0f, (float)mWindowData.height / 2 - 50.0f);
+            float x = random<float>(10.0f, (float)(mWindowData.width / 2) - 10.0f);
+            float y = random<float>(10.0f, (float)(mWindowData.height / 2) - 10.0f);
             // COMPONENT.TRANSFORM
             float speed = random<float>(mEnemyData.speed[0], mEnemyData.speed[1]);
             enemy->add<Components::CTransform>(Tools::Vec2(x, y),
                 Tools::Vec2(speed, speed));
 
             // COMPONENT.SHAPE
-            auto& componentShape = enemy->add<Components::CShape>(mEnemyData.radius, font, mEnemyData.vertices);
+            int v = random<int>(mEnemyData.vertices[0], mEnemyData.vertices[1]);
+            auto& componentShape = enemy->add<Components::CShape>(mEnemyData.radius, font, v);
             componentShape.mShape.setFillColor(sf::Color::Black);
             componentShape.mShape.setOutlineColor(mEnemyData.outlinecolor);
             componentShape.mShape.setOutlineThickness(mEnemyData.outlinethickness);
