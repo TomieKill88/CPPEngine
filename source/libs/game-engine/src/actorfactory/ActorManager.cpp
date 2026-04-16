@@ -56,7 +56,10 @@ namespace ActorManager
 
 	ActorVector& ActorManager::getActorsOfType(Actor::ActorTypeEnum actorType)
 	{
-		return mActorsPerType[actorType];
+		if (mActorsPerType.find(actorType) != mActorsPerType.end())
+			return mActorsPerType[actorType];
+		else
+			return ActorVector{};
 	}
 
 	const std::vector<size_t>& ActorManager::getAllActors() const

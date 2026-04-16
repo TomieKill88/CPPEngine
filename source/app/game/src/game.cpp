@@ -142,9 +142,15 @@ int Game::start()
 
     std::cout << "Start game" << std::endl;
 
-
-    GameEngine::GameEngine mGameEngine;
-    mGameEngine.run();
+    try
+    {
+        GameEngine::GameEngine mGameEngine;
+        mGameEngine.run();
+    }
+    catch (std::exception& e)
+    {
+        std::cout << "Execution stopped: " << e.what() << std::endl;
+    }
 
     return 0;
 }

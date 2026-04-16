@@ -84,12 +84,14 @@ namespace Components
 	{
 	public:
 
-		int left = 0, right = 0;
-		int up = 0, down = 0;
-		int shoot = 0;
+		int mLeft = 0, mRight = 0;
+		int mUp = 0, mDown = 0;
+		int mShoot = 0;
 
 		CInput() = default;
-		CInput(bool init);
+		CInput(int left, int right,
+				int up, int down,
+				int shoot);
 
 		virtual ~CInput() = default;
 	};

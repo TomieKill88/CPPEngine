@@ -34,8 +34,10 @@ namespace Components
 	}
 
 	// bool is place holder so Input can be created as nonexistent
-	CInput::CInput(bool input)
+	CInput::CInput(int left, int right,
+					int up, int down,
+					int shoot) : mLeft(left), mRight(right), mUp(up), mDown(down), mShoot(shoot)
 	{
-		exists = input;
+		exists = true;
 	}
 }

@@ -1,19 +1,18 @@
 #include <iostream>
 #include <memory>
 #include <fstream>
+#include <random>
 
 ////////////////////////////////////////////////////////////
 // Headers
 ////////////////////////////////////////////////////////////
 #include <imgui-SFML.h>
 #include <imgui.h>
-#include <nlohmann/json.hpp>
 
 
 #include "GameEngine.hpp"
 #include "actorfactory/ActorType.hpp"
 
-using json = nlohmann::json;
 
 namespace GameEngine
 {
@@ -42,50 +41,93 @@ namespace GameEngine
         {
             // Read config file
             std::ifstream f("config/appconfig.json");
-            json j = json::parse(f);
-            // Set variables and maps
-            sf::Vector2u vector;
-            vector.x = j["window"]["width"].get<int>();
-            vector.y = j["window"]["height"].get<int>();
-            mWindow = sf::RenderWindow(sf::VideoMode(vector), "CMake SFML Project");
-            mWindow.setFramerateLimit(j["window"]["framerate"].get<int>());
+            mConfigFile = nlohmann::json::parse(f);
 
+            // Window
+            mWindowData.width = mConfigFile["window"]["width"].get<int>();
+            mWindowData.height = mConfigFile["window"]["height"].get<int>();
+            mWindowData.framerate = mConfigFile["window"]["framerate"].get<int>();
+            mWindowData.fullscreen = mConfigFile["window"]["fullscreen"].get<bool>();
+            sf::Vector2u windowSize;
+            windowSize.x = mWindowData.width;
+            windowSize.y = mWindowData.height;
 
-            //Unique font for component labels
-            sf::Font font;
-            if (!font.openFromFile(j["fonts"][0].get<std::string>()))
+            auto windowState = sf::State::Windowed;
+            if(mConfigFile["window"]["fullscreen"].get<bool>())
+                windowState = sf::State::Fullscreen;
+
+            mWindow = sf::RenderWindow(sf::VideoMode(windowSize), "CMake SFML Project", sf::Style::Default, windowState);
+            mWindow.setFramerateLimit(mWindowData.framerate);
+
+            // Unique font for component labels
+            if (!font.openFromFile(mConfigFile["fonts"][0]["file"].get<std::string>()))
                 std::cout << "ERROR opening font" << std::endl;
 
-            auto shapes = j["actors"]["shapes"];
-            size_t actors = shapes.size();
+            // Player
+            auto playerConfig = mConfigFile["actors"]["player"];
+            auto player = mActorManager.createActor(Actor::ActorTypeEnum::PLAYER);
+            // COMPONENT.TRANSFORM
+            player->add<Components::CTransform>(Tools::Vec2(windowSize.x/2, windowSize.y/2),
+                                                Tools::Vec2(playerConfig["speed"].get<float>(), 
+                                                            playerConfig["speed"].get<float>()));
 
-            for (int i = 0; i < actors; i++)
-            {
-                auto actor = mActorManager.createActor(Actor::ActorTypeEnum::ENEMY);
-                
-                // set position and speed
-                actor->add<Components::CTransform>(Tools::Vec2(shapes[i]["x"].get<float>(), shapes[i]["y"].get<float>()), 
-                                                    Tools::Vec2(shapes[i]["vx"].get<float>(), shapes[i]["vy"].get<float>()));
+            // COMPONENT.SHAPE
+            auto& componentShape = player->add<Components::CShape>(playerConfig["radius"].get<float>(),
+                                                                    font,
+                                                                    playerConfig["vertices"].get<int>());
+            componentShape.mShape.setFillColor(sf::Color(playerConfig["fillcolor"][0].get<int>(),
+                                                         playerConfig["fillcolor"][1].get<int>(),
+                                                         playerConfig["fillcolor"][2].get<int>()));
+            componentShape.mShape.setOutlineColor(sf::Color(playerConfig["oulinecolor"][0].get<int>(),
+                                                            playerConfig["oulinecolor"][1].get<int>(),
+                                                            playerConfig["oulinecolor"][2].get<int>()));
+            componentShape.mShape.setOutlineThickness(playerConfig["oulinethickness"].get<int>());
+            componentShape.mShape.setPosition(sf::Vector2f(windowSize.x / 2, windowSize.y / 2));
+            // COMPONENT.SHAPE::label
+            componentShape.mLabel.setString(sf::String("player"));
+            componentShape.mLabel.setCharacterSize(mConfigFile["fonts"][0]["size"].get<int>());
+            componentShape.mLabel.setFillColor(sf::Color(mConfigFile["fonts"][0]["color"][0].get<int>(),
+                                                         mConfigFile["fonts"][0]["color"][1].get<int>(),
+                                                         mConfigFile["fonts"][0]["color"][2].get<int>()));
+            componentShape.mLabel.setOrigin(componentShape.mLabel.getLocalBounds().getCenter());
+            // MUST set Font here or else the reference is lost for some reason
+            componentShape.mLabel.setFont(componentShape.mFont);
 
-                // create shape
-                auto& componentShape = actor->add<Components::CShape>(shapes[i]["radius"].get<float>(),
-                                                                        font,
-                                                                        shapes[i]["vertix"].get<int>());
-                // set shape label
-                componentShape.mLabel.setString(sf::String(shapes[i]["label"].get<std::string>()));
-                componentShape.mLabel.setOrigin(componentShape.mLabel.getLocalBounds().getCenter());
-                // MUST set Font here or else the reference is lost for some reason
-                componentShape.mLabel.setFont(componentShape.mFont);
+            //COMPONENT.COLLISION
+            player->add<Components::CCollision>(playerConfig["collisionradius"].get<float>());
 
-                // set shape color
-                componentShape.mShape.setFillColor(sf::Color(shapes[i]["r"].get<int>(), 
-                                                             shapes[i]["g"].get<int>(), 
-                                                             shapes[i]["b"].get<int>()));                  
-            }           
+            //COMPONENT.SCORE
+            player->add<Components::CScore>(0);
+
+            //COMPONENT.INPUT
+            player->add<Components::CInput>(0,0,0,0,0);
+
+            //// BULLETS
+            auto bulletConfig = mConfigFile["actors"]["bullets"];
+            mBulletData.radius = bulletConfig["radius"].get<float>();
+            mBulletData.collisionradius = bulletConfig["collisionradius"].get<float>();
+            mBulletData.vertices = bulletConfig["vertices"].get<int>();
+            mBulletData.speed = bulletConfig["speed"].get<float>();
+            mBulletData.fillcolor = sf::Color(bulletConfig["fillcolor"][0].get<int>(), bulletConfig["fillcolor"][1].get<int>(), bulletConfig["fillcolor"][2].get<int>());
+            mBulletData.lifespan = bulletConfig["lifespan"].get<int>();
+
+            //// ENEMIES
+            auto enemyConfig = mConfigFile["actors"]["enemies"];
+            mEnemyData.radius = enemyConfig["radius"].get<float>();
+            mEnemyData.collisionradius = enemyConfig["collisionradius"].get<float>();
+            mEnemyData.vertices[0] = enemyConfig["minmaxvertices"][0].get<int>();
+            mEnemyData.vertices[1] = enemyConfig["minmaxvertices"][1].get<int>();
+            mEnemyData.speed[0] = enemyConfig["minmaxspeed"][0].get<float>();
+            mEnemyData.speed[1] = enemyConfig["minmaxspeed"][1].get<float>();
+            mEnemyData.outlinecolor = sf::Color(enemyConfig["outlinecolor"][0].get<int>(), enemyConfig["outlinecolor"][1].get<int>(), enemyConfig["outlinecolor"][2].get<int>());
+            mEnemyData.outlinethickness = enemyConfig["outlinethickness"].get<int>();
+            mEnemyData.lifespanminis = enemyConfig["lifespanminis"].get<int>();
+            mEnemyData.spanwinterval = enemyConfig["spawninterval"].get<int>();
         }
         catch (std::exception& e)
         {
             std::cout << "ERROR: GameEngine could not be initialized: " << e.what() << std::endl;
+            throw;
         }   
     }
 
@@ -102,26 +144,15 @@ namespace GameEngine
         
         // Scene Update (systems)
         //mScenes[mCurrentScene].update();
-        //////////  Wall collision  ///////////////
         auto activeActors = mActorManager.getAllActors();
-        for each ( auto& active in activeActors)
+        for each (auto & active in activeActors)
         {
-            auto &actor = mActorManager.getActor(active);
+            auto& actor = mActorManager.getActor(active);
 
             if (actor->isAlive())
             {
-                auto& transform = actor->get<Components::CTransform>();
-                auto& shape = actor->get<Components::CShape>();
-
-                shape.mShape.move(sf::Vector2f{ transform.speed.x, transform.speed.y });
-                auto shapeBounds = shape.mShape.getGlobalBounds();
-                auto shapeBoundSize = shapeBounds.size;
-                auto newPos = shape.mShape.getPosition();
-                if ((newPos.x + shapeBoundSize.x) > mWindow.getSize().x || newPos.x < 0.0f)
-                    transform.speed.x *= -1;
-                if ((newPos.y + shapeBoundSize.y) > mWindow.getSize().y || newPos.y < 0.0f)
-                    transform.speed.y *= -1;
-                shape.mLabel.setPosition(shape.mShape.getGlobalBounds().getCenter());
+                sMovement(actor);
+                sWallCollision(actor);
             }
         }        
     }
@@ -163,19 +194,16 @@ namespace GameEngine
             {
                 ImGui::SFML::ProcessEvent(mWindow, *event);
 
-                if (event->is<sf::Event::Closed>())
-                {
-                    mWindow.close(); 
-                    mIsRunning = false;
-                }
+                sInput(*event);                
             }
 
-            // Update Widgets - Update Scene State
+            // Update Widgets - Update Scene State(systems, ActorManager)
             update();
 
             // Render Widgets - Render Scene State
             render();
 
+            mFrameCounter++;
         }
 
         if (mWindow.isOpen())
@@ -206,17 +234,139 @@ namespace GameEngine
         return mWindow;
     }
 
-    void GameEngine::userInput()
-    {}
-    
-    std::shared_ptr<sf::Shape> getShape(int type)
-    {
-        if (type == 1)
-            return std::make_shared<sf::CircleShape>(30.0f);
+
+    // Systems
+    void GameEngine::sMovement(ActorManager::ActorPtr actor)
+    {        
+        auto& transform = actor->get<Components::CTransform>();
+        auto& shape = actor->get<Components::CShape>();
+
+        if (actor->has<Components::CInput>())
+        {
+            auto input = actor->get<Components::CInput>();
+            float horizontal = input.mRight - input.mLeft;
+            float vertical = input.mDown - input.mUp;
+
+            // "normalize" (1/sqrt(2)) vector if both dir are pressed to keep speed constant
+            if (horizontal != 0 && vertical != 0)
+            {
+                horizontal *= 1/1.4;
+                vertical *= 1/1.4;
+            }
+
+            shape.mShape.move(sf::Vector2f{ transform.speed.x * horizontal, transform.speed.y * vertical });
+        }
         else
-            return std::make_shared<sf::RectangleShape>();
+        {
+            //If actor DOESN'T have CInput component (ENEMY) then move random.
+            shape.mShape.move(sf::Vector2f{ transform.speed.x, transform.speed.y });
+        }        
+        shape.mLabel.setPosition(shape.mShape.getGlobalBounds().getCenter());        
     }
-        
+
+    bool GameEngine::sCollision(ActorManager::ActorPtr mainActor, ActorManager::ActorPtr secondaryActor)
+    {
+        return false;
+    }
+
+    void GameEngine::sWallCollision(ActorManager::ActorPtr actor)
+    {   
+        // Wall collision
+        auto& transform = actor->get<Components::CTransform>();
+        auto& shape = actor->get<Components::CShape>();
+
+        auto shapeBounds = shape.mShape.getGlobalBounds();
+        auto shapeBoundSize = shapeBounds.size;
+        auto newPos = shape.mShape.getPosition();
+        if ((newPos.x + shapeBoundSize.x) > mWindow.getSize().x || newPos.x < 0.0f)
+            transform.speed.x *= -1;
+        if ((newPos.y + shapeBoundSize.y) > mWindow.getSize().y || newPos.y < 0.0f)
+            transform.speed.y *= -1;
+    }
+    
+    void GameEngine::sInput(const sf::Event& event)
+    {
+        if (event.is<sf::Event::Closed>())
+        {
+            mWindow.close();
+            mIsRunning = false;
+            return;
+        }
+
+        auto players = mActorManager.getActorsOfType(Actor::ActorTypeEnum::PLAYER);
+        if (players.empty())
+            return;
+
+        auto player = players[0];
+
+        if (const auto *keyPressed = event.getIf<sf::Event::KeyPressed>())
+        {
+            if (keyPressed->scancode == sf::Keyboard::Scancode::W || keyPressed->scancode == sf::Keyboard::Scancode::Up)
+                player->get<Components::CInput>().mUp = 1;
+            else if (keyPressed->scancode == sf::Keyboard::Scancode::S || keyPressed->scancode == sf::Keyboard::Scancode::Down)
+                player->get<Components::CInput>().mDown = 1;
+            else if (keyPressed->scancode == sf::Keyboard::Scancode::A || keyPressed->scancode == sf::Keyboard::Scancode::Left)
+                player->get<Components::CInput>().mLeft = 1;
+            else if (keyPressed->scancode == sf::Keyboard::Scancode::D || keyPressed->scancode == sf::Keyboard::Scancode::Right)
+                player->get<Components::CInput>().mRight = 1;
+        }
+        else if (const auto* keyPressed = event.getIf<sf::Event::KeyReleased>())
+        {
+            if (keyPressed->scancode == sf::Keyboard::Scancode::W || keyPressed->scancode == sf::Keyboard::Scancode::Up)
+                player->get<Components::CInput>().mUp = 0;
+            else if (keyPressed->scancode == sf::Keyboard::Scancode::S || keyPressed->scancode == sf::Keyboard::Scancode::Down)
+                player->get<Components::CInput>().mDown = 0;
+            else if (keyPressed->scancode == sf::Keyboard::Scancode::A || keyPressed->scancode == sf::Keyboard::Scancode::Left)
+                player->get<Components::CInput>().mLeft = 0;
+            else if (keyPressed->scancode == sf::Keyboard::Scancode::D || keyPressed->scancode == sf::Keyboard::Scancode::Right)
+                player->get<Components::CInput>().mRight = 0;
+        }
+        else if (const auto* buttonPressed = event.getIf<sf::Event::MouseButtonPressed>())
+        {
+            if (buttonPressed->button == sf::Mouse::Button::Left)
+                player->get<Components::CInput>().mShoot = 1;
+        }
+        else if (const auto* buttonPressed = event.getIf<sf::Event::MouseButtonReleased>())
+        {
+            if (buttonPressed->button == sf::Mouse::Button::Left)
+                player->get<Components::CInput>().mShoot = 0;
+        }
+    }
+
+    void GameEngine::sEnemySpawner()
+    {
+        if (mFrameCounter % mEnemyData.spanwinterval == 0)
+        {
+            auto enemy = mActorManager.createActor(Actor::ActorTypeEnum::ENEMY);
+            // +-50.0 so enemies don't spawn touching the borders
+            float x = random<float>(50.0f, (float)mWindowData.width / 2 - 50.0f);
+            float y = random<float>(50.0f, (float)mWindowData.height / 2 - 50.0f);
+            // COMPONENT.TRANSFORM
+            float speed = random<float>(mEnemyData.speed[0], mEnemyData.speed[1]);
+            enemy->add<Components::CTransform>(Tools::Vec2(x, y),
+                Tools::Vec2(speed, speed));
+
+            // COMPONENT.SHAPE
+            auto& componentShape = enemy->add<Components::CShape>(mEnemyData.radius, font, mEnemyData.vertices);
+            componentShape.mShape.setFillColor(sf::Color::Black);
+            componentShape.mShape.setOutlineColor(mEnemyData.outlinecolor);
+            componentShape.mShape.setOutlineThickness(mEnemyData.outlinethickness);
+            componentShape.mShape.setPosition(sf::Vector2f(x, y));
+            // COMPONENT.SHAPE::label
+            componentShape.mLabel.setString(sf::String("enemy"));
+            componentShape.mLabel.setCharacterSize(mConfigFile["fonts"][0]["size"].get<int>());
+            componentShape.mLabel.setFillColor(sf::Color(mConfigFile["fonts"][0]["color"][0].get<int>(),
+                mConfigFile["fonts"][0]["color"][1].get<int>(),
+                mConfigFile["fonts"][0]["color"][2].get<int>()));
+            componentShape.mLabel.setOrigin(componentShape.mLabel.getLocalBounds().getCenter());
+            // MUST set Font here or else the reference is lost for some reason
+            componentShape.mLabel.setFont(componentShape.mFont);
+
+            //COMPONENT.COLLISION
+            enemy->add<Components::CCollision>(mEnemyData.collisionradius);
+        }
+    }
+    
 
     ////////////////////////////////////////////////////////////
     /// Entry point of application
@@ -224,6 +374,13 @@ namespace GameEngine
     /// \return Application exit code
     ///
     ////////////////////////////////////////////////////////////
+    std::shared_ptr<sf::Shape> getShape(int type)
+    {
+        if (type == 1)
+            return std::make_shared<sf::CircleShape>(30.0f);
+        else
+            return std::make_shared<sf::RectangleShape>();
+    }
     void drawTest(sf::RenderWindow& window)
     {
 

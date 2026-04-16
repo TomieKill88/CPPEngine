@@ -53,6 +53,11 @@ namespace GuiTools
 				auto &currentShapeSelected = BaseGui::mGameEngineInterface->mActorManager.getActor(mActiveActorsIndex[currentShapeIndex]);
 				auto &selectedShape = currentShapeSelected->get<Components::CShape>();
 
+				ImGui::SameLine(); if (ImGui::Button("D"))
+				{
+					BaseGui::mGameEngineInterface->mActorManager.destroyActor(mActiveActorsIndex[currentShapeIndex]);
+				}
+
 				//////////  Shape name  ///////////////
 
 				ImGui::InputTextWithHint("Name", "Enter shape name", nameInput, IM_ARRAYSIZE(nameInput));
