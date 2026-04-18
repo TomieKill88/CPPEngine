@@ -2,7 +2,7 @@
   "window": {
     "width": 1280,
     "height": 960,
-    "framerate": 144,
+    "framerate": 20,
     "fullscreen": false
   },
   "fonts": [
@@ -20,21 +20,21 @@
       "speed": 1.0,
       "fillcolor": [ 0, 0, 0 ],
       "oulinecolor": [ 255, 255, 255 ],
-      "oulinethickness": 1
+      "oulinethickness": 3
     },
     "bullets": {
       "radius": 5.0,
       "collisionradius": 5.0,
       "vertices": 20,
-      "speed": 1.0,
+      "speed": 5.0,
       "fillcolor": [ 255, 255, 255 ],
-      "lifespan": 5
+      "lifespan": 80
     },
     "enemies": {
-      "radius": 10.0,
-      "collisionradius": 10.0,
-      "minmaxvertices": [ 3, 6 ],
-      "minmaxspeed": [ 1.0, 4.0 ],
+      "radius": 30.0,
+      "collisionradius": 30.0,
+      "minmaxvertices": [ 5, 8 ],
+      "minmaxspeed": [ 1.0, 2.5 ],
       "outlinecolor": [ 255, 255, 255 ],
       "outlinethickness": 1,
       "lifespanminis": 5,
