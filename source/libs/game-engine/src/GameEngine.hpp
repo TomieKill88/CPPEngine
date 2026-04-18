@@ -44,6 +44,7 @@ namespace GameEngine
 
 		//Privates
 		sf::Font font;
+		sf::Vector2i mMouseCapture;
 
 		int mFrameCounter = 0;
 		nlohmann::json mConfigFile;
@@ -92,9 +93,11 @@ namespace GameEngine
 		void sWallCollision(ActorManager::ActorPtr actor);
 		void sInput(const sf::Event& event);
 		void sEnemySpawner();
+		void sShoot(ActorManager::ActorPtr actor);
 
 
 		// TEMP -> to move later
+		int activeEnemies = 0;
 		template<typename T>
 		T random(T min, T max)
 		{

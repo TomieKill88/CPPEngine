@@ -75,7 +75,7 @@ namespace Components
 		int mRemainingFrames = 0;
 
 		CLifespan() = default;
-		CLifespan(int lifeFrames, int remainingFrames);
+		CLifespan(int lifeFrames);
 
 		virtual ~CLifespan() = default;
 	};

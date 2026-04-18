@@ -144,7 +144,30 @@ namespace GameEngine
         
         // Scene Update (systems)
         //mScenes[mCurrentScene].update();
-        sEnemySpawner();
+        
+        auto player = mActorManager.getActor(Actor::ActorTypeEnum::PLAYER, 0);
+        auto enemies = mActorManager.getActorsOfType(Actor::ActorTypeEnum::ENEMY);
+        auto bullets = mActorManager.getActorsOfType(Actor::ActorTypeEnum::BULLET);
+
+        // Check collisions
+        for each(auto& enemy in enemies)
+        {
+            //bool playerCollision = sCollision(player, enemy);
+            // Reset player
+            // destroy enemy
+            // continue (dont check collision with bullet)
+
+            for each(auto& bullet in bullets)
+            {
+                if (sCollision(enemy, bullet))
+                {
+                    // enemy "shoot" smaller enemies
+                    mActorManager.destroyActor(enemy->getId());
+                    mActorManager.destroyActor(bullet->getId());
+                    --activeEnemies;
+                }                
+            }
+        }
 
         auto activeActors = mActorManager.getAllActors();
         for each (auto & active in activeActors)
@@ -155,8 +178,19 @@ namespace GameEngine
             {
                 sMovement(actor);
                 sWallCollision(actor);
+
+                if (actor->has<Components::CLifespan>())
+                {
+                    int remain = actor->get<Components::CLifespan>().mRemainingFrames -= 1;
+                    if (remain <= 0)
+                        mActorManager.destroyActor(active);
+                }
             }
-        }        
+        }
+        
+        // Only the player shoots at the moment.
+        sShoot(player);
+        sEnemySpawner();
     }
 
     void GameEngine::render()
@@ -268,7 +302,19 @@ namespace GameEngine
 
     bool GameEngine::sCollision(ActorManager::ActorPtr mainActor, ActorManager::ActorPtr secondaryActor)
     {
-        return false;
+        if (!mainActor->has<Components::CCollision>() || !secondaryActor->has<Components::CCollision>())
+            return false;
+
+        float mainRadius = mainActor->get<Components::CCollision>().mRadius;
+        float secondRadius = secondaryActor->get<Components::CCollision>().mRadius;
+
+        auto mainActorPos = mainActor->get<Components::CShape>().mShape.getPosition();
+        auto secondActorPos = secondaryActor->get<Components::CShape>().mShape.getPosition();
+
+        float distSquared = (secondActorPos.x - mainActorPos.x) * (secondActorPos.x - mainActorPos.x) +
+                            (secondActorPos.y - mainActorPos.y) * (secondActorPos.y - mainActorPos.y);
+
+        return distSquared < (mainRadius * mainRadius) + (secondRadius * secondRadius);
     }
 
     void GameEngine::sWallCollision(ActorManager::ActorPtr actor)
@@ -326,17 +372,18 @@ namespace GameEngine
         else if (const auto* buttonPressed = event.getIf<sf::Event::MouseButtonPressed>())
         {
             if (buttonPressed->button == sf::Mouse::Button::Left)
+            {
+                mMouseCapture = sf::Mouse::getPosition(mWindow);
                 player->get<Components::CInput>().mShoot = 1;
-        }
-        else if (const auto* buttonPressed = event.getIf<sf::Event::MouseButtonReleased>())
-        {
-            if (buttonPressed->button == sf::Mouse::Button::Left)
-                player->get<Components::CInput>().mShoot = 0;
+            }
         }
     }
 
     void GameEngine::sEnemySpawner()
     {
+        if (activeEnemies >= 5)
+            return;
+
         if (mFrameCounter % mEnemyData.spanwinterval == 0)
         {
             auto enemy = mActorManager.createActor(Actor::ActorTypeEnum::ENEMY);
@@ -367,9 +414,46 @@ namespace GameEngine
 
             //COMPONENT.COLLISION
             enemy->add<Components::CCollision>(mEnemyData.collisionradius);
+
+            activeEnemies++;
         }
     }
     
+    void GameEngine::sShoot(ActorManager::ActorPtr actor)
+    {
+        if (!actor->get<Components::CInput>().mShoot)
+            return;
+
+        float x = actor->get<Components::CShape>().mShape.getPosition().x + actor->get<Components::CShape>().mShape.getGeometricCenter().x;
+        float y = actor->get<Components::CShape>().mShape.getPosition().y + actor->get<Components::CShape>().mShape.getGeometricCenter().y;
+
+        auto bullet = mActorManager.createActor(Actor::ActorTypeEnum::BULLET);
+
+        Tools::Vec2 speed = { mMouseCapture.x - x, mMouseCapture.y - y };
+        speed.normalize();
+        bullet->add<Components::CTransform>(Tools::Vec2(x, y),
+            Tools::Vec2((mBulletData.speed * speed.x), (mBulletData.speed * speed.y)));
+
+        // COMPONENT.SHAPE
+
+        auto& componentShape = bullet->add<Components::CShape>(mBulletData.radius, font, mBulletData.vertices);
+        componentShape.mShape.setFillColor(mBulletData.fillcolor);
+        componentShape.mShape.setOutlineColor(mBulletData.fillcolor);
+        componentShape.mShape.setPosition(sf::Vector2f(x, y));
+        // COMPONENT.SHAPE::label
+        componentShape.mLabel.setString(sf::String(""));
+        // MUST set Font here or else the reference is lost for some reason
+        componentShape.mLabel.setFont(componentShape.mFont);
+
+        //COMPONENT.COLLISION
+        bullet->add<Components::CCollision>(mBulletData.collisionradius);
+
+        //COMPONENT.LIFESPAN
+        bullet->add<Components::CLifespan>(mBulletData.lifespan);
+
+        actor->get<Components::CInput>().mShoot = 0;
+
+    }
 
     ////////////////////////////////////////////////////////////
     /// Entry point of application

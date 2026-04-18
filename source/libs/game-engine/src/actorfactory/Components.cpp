@@ -28,7 +28,7 @@ namespace Components
 		mShape.setPointCount(pointCount);
 	}
 
-	CLifespan::CLifespan(int lifeFrames, int remainingFrames) : mLifeFrames(lifeFrames), mRemainingFrames(remainingFrames)
+	CLifespan::CLifespan(int lifeFrames) : mLifeFrames(lifeFrames), mRemainingFrames(lifeFrames)
 	{
 		exists = true;
 	}
