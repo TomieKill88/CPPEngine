@@ -23,8 +23,14 @@ namespace Actor
 		case (ActorTypeEnum::PLAYER):
 			name = std::string("PLAYER");
 			break;
+		case (ActorTypeEnum::SHIELD):
+			name = std::string("SHIELD");
+			break;
 		case (ActorTypeEnum::ENEMY):
 			name = std::string("ENEMY");
+			break;
+		case (ActorTypeEnum::ENEMY_MINI):
+			name = std::string("ENEMY_MINI");
 			break;
 		case (ActorTypeEnum::BULLET):
 			name = std::string("BULLET");

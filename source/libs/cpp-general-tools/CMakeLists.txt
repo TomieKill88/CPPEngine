@@ -9,11 +9,17 @@ add_library(${TARGET_NAME} STATIC)
 # Sources
 #--------------------------------------------------------------------------
 list(APPEND helper-tools_SOURCES  # sources
-								src/ConfigFileReader.hpp
-								src/ConfigFileReader.cpp
-								src/SmartEnum.hpp
-								src/Vec2.hpp
-								src/Vec2.cpp)
+								src/fileutils/ConfigFileReader.hpp
+								src/fileutils/ConfigFileReader.cpp
+								
+								src/general/SmartEnum.hpp
+								src/general/Random.hpp
+								src/general/Random.cpp
+								
+								src/science/Math.hpp
+								src/science/Math.cpp
+								src/science/Vec2.hpp
+								src/science/Vec2.cpp)
 
 target_sources(${TARGET_NAME} PRIVATE ${helper-tools_SOURCES})
 
@@ -27,7 +33,7 @@ target_include_directories(${TARGET_NAME} INTERFACE ${CMAKE_CURRENT_SOURCE_DIR})
 # Group Files (mainly for VS)
 #--------------------------------------------------------------------------
 
-source_group(src FILES ${helper-tools_SOURCES})
+source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR}/src FILES ${helper-tools_SOURCES})
 
 #--------------------------------------------------------------------------
 # External Libraries

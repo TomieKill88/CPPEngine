@@ -2,7 +2,7 @@
 
 #include <SFML/Graphics.hpp>
 
-#include "src/Vec2.hpp"
+#include "src/science/Vec2.hpp"
 
 
 namespace Components
@@ -19,11 +19,11 @@ namespace Components
 
 	public:
 
-		Tools::Vec2 position = { 0.0f, 0.0f };
-		Tools::Vec2 speed = { 0.0f, 0.0f };
+		Tools::Science::Vec2 position = { 0.0f, 0.0f };
+		Tools::Science::Vec2 speed = { 0.0f, 0.0f };
 
 		CTransform() = default;
-		CTransform(const Tools::Vec2& pPosition, const Tools::Vec2& pSpeed);
+		CTransform(const Tools::Science::Vec2& pPosition, const Tools::Science::Vec2& pSpeed);
 
 		virtual ~CTransform() = default;
 	};
@@ -33,7 +33,9 @@ namespace Components
 
 	public:
 
+		bool mDraw = false;
 		float mRadius = 0.0f;
+		sf::CircleShape mShape;
 
 		CCollision() = default;
 		CCollision(float radius);

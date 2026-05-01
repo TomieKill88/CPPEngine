@@ -26,6 +26,8 @@ list(APPEND game-engine_SOURCES  # sources
 								src/guitools/BaseGui.cpp
 								src/guitools/FirstGui.hpp
 								src/guitools/FirstGui.cpp
+								src/guitools/SecondGui.hpp
+								src/guitools/SecondGui.cpp
 								
 								# Scenes
 								src/scenes/BaseScene.hpp

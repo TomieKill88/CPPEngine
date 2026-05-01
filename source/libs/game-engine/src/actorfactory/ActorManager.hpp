@@ -15,7 +15,7 @@ namespace ActorManager
 	{
 	private:
 
-		size_t mActorAmount = 10000;
+		size_t mActorAmount = 300;
 		ActorVector mActorPool;
 		std::vector<size_t> mToAdd;
 		std::vector<size_t> mToDestroy;
@@ -35,7 +35,7 @@ namespace ActorManager
 		void destroyActor(int actorId);
 		ActorVector& getActorsOfType(Actor::ActorTypeEnum actorType);
 		const std::vector<size_t>& getAllActors() const;
-		ActorPtr getActor(Actor::ActorTypeEnum actorType, int actorId);
+		ActorPtr getActor(Actor::ActorTypeEnum actorType, int actorIndex);
 		ActorPtr getActor(int actorId);
 		void update();
 	};

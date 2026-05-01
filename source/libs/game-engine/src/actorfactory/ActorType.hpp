@@ -2,8 +2,7 @@
 
 #include<cstdint>
 
-#include "src/SmartEnum.hpp"
-#include "src/ConfigFileReader.hpp"
+#include "src/general/SmartEnum.hpp"
 
 namespace Actor
 {
@@ -11,12 +10,17 @@ namespace Actor
 	{
 		NONE = 0,
 		PLAYER,
+		SHIELD,
+		// ENEMIES
 		ENEMY,
+		ENEMY_MINI,
+		// PROYECTILES
 		BULLET,
+		// OBJECTS
 		TILE
 	};
 
-	class ActorType : public Tools::SmartEnum<ActorTypeEnum>
+	class ActorType : public Tools::General::SmartEnum<ActorTypeEnum>
 	{
 	public:
 

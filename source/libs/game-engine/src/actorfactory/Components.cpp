@@ -2,7 +2,7 @@
 
 namespace Components
 {
-	CTransform::CTransform(const Tools::Vec2& pPosition, const Tools::Vec2& pSpeed) : position(pPosition), speed(pSpeed)
+	CTransform::CTransform(const Tools::Science::Vec2& pPosition, const Tools::Science::Vec2& pSpeed) : position(pPosition), speed(pSpeed)
 	{
 		exists = true;
 	}
@@ -10,6 +10,12 @@ namespace Components
 	CCollision::CCollision(float radius) : mRadius(radius)
 	{
 		exists = true;
+		mShape.setRadius(radius);
+		mShape.setPointCount(20);
+		mShape.setFillColor(sf::Color(0,0,0,0));
+		mShape.setOutlineColor(sf::Color::Red);
+		mShape.setOutlineThickness(1.0);
+		mShape.setOrigin(mShape.getLocalBounds().getCenter());
 	}
 
 	CScore::CScore(int score) : mScore(score)
@@ -26,6 +32,8 @@ namespace Components
 		exists = true;
 		mShape.setRadius(radius);
 		mShape.setPointCount(pointCount);
+		//mShape.setOrigin(mShape.getLocalBounds().getCenter());
+		mShape.setOrigin(mShape.getGeometricCenter());
 	}
 
 	CLifespan::CLifespan(int lifeFrames) : mLifeFrames(lifeFrames), mRemainingFrames(lifeFrames)

@@ -18,7 +18,7 @@ namespace ActorManager
 
 		mFreeActors.reserve(mActorAmount);
 		//std::iota(mFreeActors.begin(), mFreeActors.end(), 0); not working for some reason
-		for (int i = 0; i < mActorAmount; i++)
+		for (int i = mActorAmount - 1; i >= 0; i--)
 			mFreeActors.push_back(i);
 
 		mActiveActors.reserve(mActorAmount);
@@ -71,18 +71,12 @@ namespace ActorManager
 		return mActiveActors;
 	}
 
-	ActorPtr ActorManager::getActor(Actor::ActorTypeEnum actorType, int actorId)
+	ActorPtr ActorManager::getActor(Actor::ActorTypeEnum actorType, int actorIndex)
 	{
 		ActorVector actorGroup = mActorsPerType[actorType];
 
-		for (auto it = actorGroup.begin(); it != actorGroup.end(); ++it)
-		{
-			if ((*it)->getId() == actorId)
-			{
-				return (*it);
-				break;
-			}				
-		}
+		if (actorGroup.size() > actorIndex)
+			return actorGroup[actorIndex];
 
 		return nullptr;
 	}
@@ -94,9 +88,13 @@ namespace ActorManager
 
 	void ActorManager::update()
 	{		
+		//std::cout << "Manager Update" << std::endl;
+
+		//std::cout << "Destroying: ";
 		// Remove destroyed
 		for (auto actor : mToDestroy)
 		{
+			//std::cout << actor << ", ";
 			// Remove from actives
 			auto actorToDeleteIndex = std::find(mActiveActors.begin(), mActiveActors.end(), actor);
 			if (actorToDeleteIndex != mActiveActors.end())
@@ -122,14 +120,17 @@ namespace ActorManager
 			mFreeActors.push_back(actor);
 		}
 		mToDestroy.clear();
+		//std::cout << std::endl;
 
-
+		//std::cout << "To add: ";
 		//Add all new actors
 		for (auto actor : mToAdd)
 		{
+			//std::cout << actor << ", ";
 			mActiveActors.push_back(actor);
 			mActorsPerType[mActorPool[actor]->getTag()].push_back(mActorPool[actor]);
 		}
-		mToAdd.clear();		
+		mToAdd.clear();
+		//std::cout << std::endl;
 	}
 }

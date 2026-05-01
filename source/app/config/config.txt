@@ -1,0 +1,4 @@
+Window 720 640
+Fonts resources/AovelSans.ttf
+Rectangle "Recky" 0.0 0.0 0.0 0.0 100 100 100 200.0 100.0
+Circle "Bouncy" 100.0 100.0 0.0 0.0 200 200 200 60.0 

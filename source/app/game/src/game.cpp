@@ -11,7 +11,7 @@
 #include "Game.hpp"
 #include "src/GameEngine.hpp"
 
-#include "src/Vec2.hpp"
+#include "src/science/Vec2.hpp"
 
 
 /*

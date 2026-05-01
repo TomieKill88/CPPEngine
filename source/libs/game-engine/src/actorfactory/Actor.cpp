@@ -10,12 +10,12 @@ namespace Actor
 	Actor::Actor(ActorTypeEnum actorType, size_t id) : id(id)
 	{
 		init(actorType);
-		removeAll();
 	}
 
 	void Actor::init(ActorTypeEnum actorType)
 	{
 		tag.setEnum(actorType);
+		removeAll();
 		mAlive = true;
 	}
 
@@ -36,7 +36,8 @@ namespace Actor
 
 	std::string Actor::getTagString()
 	{
-		return tag.toString();
+		std::string tagid = tag.toString() + std::to_string(id);
+		return tagid;
 	}
 
 	void Actor::destroy()
