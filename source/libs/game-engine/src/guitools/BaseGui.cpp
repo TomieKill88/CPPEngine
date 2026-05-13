@@ -4,7 +4,7 @@
 namespace GuiTools
 {	
 
-	BaseGui::BaseGui(GameEngine::GameEngine* gameEngineInterface) : mGameEngineInterface(gameEngineInterface) {};
+	//BaseGui::BaseGui(GameEngine::GameEngine* gameEngineInterface) : mGameEngineInterface(gameEngineInterface) {};
 
 	bool BaseGui::begin(std::string& title)
 	{
