@@ -128,7 +128,17 @@ namespace Scene
         if (msSpecials > 0)
             sSpecial(mPlayer);
         if (msSpecialCooldown > 0)
+        {
             msSpecialCooldown--;
+            int timeToRepeat = msSpecialCooldown / 60;
+            mPlayer->get<Components::CShape>().mLabel.setString(sf::String(std::to_string(timeToRepeat).c_str()));
+        }
+        else
+        {
+            mPlayer->get<Components::CShape>().mLabel.setString(sf::String(""));
+        }
+
+            
 
         sCollision();
 
@@ -145,11 +155,15 @@ namespace Scene
             {
                 int initial = actor->get<Components::CLifespan>().mLifeFrames;
                 int remain = actor->get<Components::CLifespan>().mRemainingFrames -= 1;
-                sf::Color color = actor->get<Components::CShape>().mShape.getFillColor();
+                
                 sf::Color out = actor->get<Components::CShape>().mShape.getOutlineColor();
-                color.a = 255.0 * ((float)remain / initial);
+                if (actor->getTag() != Actor::ActorTypeEnum::SHIELD)
+                {
+                    sf::Color color = actor->get<Components::CShape>().mShape.getFillColor();
+                    color.a = 255 * ((float)remain / initial);
+                    actor->get<Components::CShape>().mShape.setFillColor(color);
+                }                    
                 out.a = 255.0 * ((float)remain / initial);
-                actor->get<Components::CShape>().mShape.setFillColor(color);
                 actor->get<Components::CShape>().mShape.setOutlineColor(out);
                 if (remain <= 0)
                 {
@@ -162,9 +176,6 @@ namespace Scene
             {
                 auto& shape = actor->get<Components::CShape>().mShape;
                 shape.setPosition(mPlayer->get<Components::CShape>().mShape.getPosition());
-                shape.setOutlineThickness(shape.getOutlineThickness() + 0.1);
-                shape.setRadius(shape.getRadius() + 0.5);
-                actor->get<Components::CCollision>().mRadius += 0.5;
                 continue;
             }
             sMovement(actor);
@@ -291,7 +302,7 @@ namespace Scene
         auto enemies = mActorManager.getActorsOfType(Actor::ActorTypeEnum::ENEMY);
         auto minis = mActorManager.getActorsOfType(Actor::ActorTypeEnum::ENEMY_MINI);
         auto bullets = mActorManager.getActorsOfType(Actor::ActorTypeEnum::BULLET);
-        auto shield = mActorManager.getActorsOfType(Actor::ActorTypeEnum::SHIELD);
+        auto shields = mActorManager.getActorsOfType(Actor::ActorTypeEnum::SHIELD);
 
         // ENEMY COLLISIONS
         for each (auto & enemy in enemies)
@@ -325,6 +336,17 @@ namespace Scene
                     mActorManager.destroyActor(bullet->getId());
                     msActiveEnemies -= 1;
                     break; // break because enemy was destroyed, no need to check with any other bullet
+                }
+            }
+            
+            for each(auto shield in shields)
+            {
+                if (shCheckCollision(enemy, shield))
+                {
+                    enemy->get<Components::CTransform>().speed.x *= -1;
+                    enemy->get<Components::CTransform>().speed.y *= -1;
+                    shield->remove<Components::CCollision>();
+                    break;
                 }
             }
         }
@@ -472,6 +494,12 @@ namespace Scene
 
     void GeoWarsMainScene::sSpecial(ActorManager::ActorPtr actor)
     {
+        if (msSpecialCooldown > 0)
+        {
+            msSpecials = 0;
+            return;
+        }
+
         if (msSpecialWait == 0)
         {
             float x = actor->get<Components::CShape>().mShape.getPosition().x;
@@ -481,10 +509,12 @@ namespace Scene
             shield->add<Components::CTransform>(Tools::Science::Vec2(x, y),
                 Tools::Science::Vec2(mGameEngine->mActorData.speed, mGameEngine->mActorData.speed));
 
-            auto& componentShape = shield->add<Components::CShape>(mGameEngine->mActorData.radius, mGameEngine->font, mGameEngine->mActorData.vertices);
+            float radius = mGameEngine->mActorData.radius + mGameEngine->mActorData.specialSeparation * (1 + mGameEngine->mActorData.specialAmount - msSpecials);
+            int thick = 2 * mGameEngine->mActorData.outlinethickness * (mGameEngine->mActorData.specialAmount - msSpecials);
+            auto& componentShape = shield->add<Components::CShape>(radius, mGameEngine->font, mGameEngine->mActorData.vertices);
             componentShape.mShape.setFillColor(sf::Color(0, 0, 0, 0));
-            componentShape.mShape.setOutlineColor(sf::Color(8, 87, 109)); // electric teal
-            componentShape.mShape.setOutlineThickness(mGameEngine->mActorData.outlinethickness);
+            componentShape.mShape.setOutlineColor(sf::Color(108, 187, 209)); // electric teal
+            componentShape.mShape.setOutlineThickness(thick);
             componentShape.mShape.setPosition(sf::Vector2f(x, y));
             // COMPONENT.SHAPE::label
             componentShape.mLabel.setString(sf::String(""));
@@ -492,7 +522,7 @@ namespace Scene
             componentShape.mLabel.setFont(componentShape.mFont);
 
             //COMPONENT.COLLISION
-            shield->add<Components::CCollision>(mGameEngine->mActorData.collisionradius);
+            shield->add<Components::CCollision>(radius);
 
             //COMPONENT.LIFESPAN
             shield->add<Components::CLifespan>(mGameEngine->mActorData.specialLifespan);
