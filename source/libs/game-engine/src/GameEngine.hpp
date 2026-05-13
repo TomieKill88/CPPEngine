@@ -3,7 +3,7 @@
 #include <SFML/Graphics.hpp>
 #include <nlohmann/json.hpp>
 
-#include "guitools/SecondGui.hpp"
+#include "guitools/ThirdGui.hpp"
 #include "scenes/BaseScene.hpp"
 #include "actorfactory/ActorManager.hpp"
 #include "actorfactory/Actor.hpp"
@@ -55,41 +55,38 @@ namespace GameEngine
 		int spanwinterval = -1;
 	};
 
-	class GameEngine
+	struct sAssetsData
 	{
-		
-		//Privates
-		sf::Font font;
-		sf::Vector2i mMouseCapture;
+		int fontsize = 0;
+		sf::Color fontcolor = sf::Color::White;
+	};
 
-		int mFrameCounter = 0;
-		nlohmann::json mConfigFile;
-		
+	class GameEngine
+	{		
+		//Privates
+		nlohmann::json mConfigFile;		
 
 		// Scenes
 		std::map<std::string, std::shared_ptr<Scene::BaseScene>> mScenes;
-		std::shared_ptr<Scene::BaseScene> mCurrentScene;
-
+		std::shared_ptr<Scene::BaseScene> mCurrentScene;		
 		
-		
-		//GUIs
-		std::unique_ptr<GuiTools::SecondGui> mGuiTools;
 		
 		// SFML
 		sf::RenderWindow mWindow;
 		sf::Clock mClock;
 		bool mIsRunning = false;
 
+		void processSfmlInput(const sf::Event& event);
+
 	public:
 
 		//Vector<assests>
+		sf::Font font;
 		sWindowData mWindowData;
 		sActorData mActorData;
 		sBulletData mBulletData;
-		sEnemyData mEnemyData;
-
-		// Actors
-		ActorManager::ActorManager mActorManager;
+		sEnemyData mEnemyData; 
+		sAssetsData mAssetsData;
 
 		GameEngine();
 		~GameEngine() = default;
@@ -100,35 +97,11 @@ namespace GameEngine
 		void run();
 		void quit();
 		void changeScene(std::string& newScene);
-		const sf::RenderWindow& getWindow();
-		
-
+		sf::RenderWindow& getWindow();
 
 		//SYSTEMS
-		void sMovement(ActorManager::ActorPtr actor);
-		bool sCollision(ActorManager::ActorPtr mainActor, ActorManager::ActorPtr secondaryActor);
-		void sWallCollision(ActorManager::ActorPtr actor);
-		void sInput(const sf::Event& event);
-		void sEnemySpawner();
-		void sSmallEnemySpawner(ActorManager::ActorPtr enemyDestroyed);
-		void sShoot(ActorManager::ActorPtr actor);
-		void sInvincibility(ActorManager::ActorPtr actor);
-		void sSpecial(ActorManager::ActorPtr actor);
-
-
-		// TEMP -> to move later
-		int MAX_ENEMY_SPAN = 1;
-		int INVINCIBILITY_FRAMES = 180;
-		int activeEnemies = 0;
-		int invincible = -1;
-		int invincibleBlink = 0;
-		bool invincibleColor = false;
-		int specials = 0;
-		int cooldown = 0;
-		int wait = 0;
+		void sInput(Scene::ActionStateEnum pActionState, Input::InputCode pInputCode);
+				
 		
 	};
-
-
-	void callWindowTest();
 }

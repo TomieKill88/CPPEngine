@@ -24,11 +24,13 @@ list(APPEND game-engine_SOURCES  # sources
 								# GUI-tools
 								src/guitools/BaseGui.hpp
 								src/guitools/BaseGui.cpp
-								src/guitools/FirstGui.hpp
-								src/guitools/FirstGui.cpp
-								src/guitools/SecondGui.hpp
-								src/guitools/SecondGui.cpp
-								
+								#src/guitools/FirstGui.hpp
+								#src/guitools/FirstGui.cpp
+								#src/guitools/SecondGui.hpp
+								#src/guitools/SecondGui.cpp
+								#src/guitools/ThirdGui.hpp
+								#src/guitools/ThirdGui.cpp
+
 								# Scenes
 								src/scenes/BaseScene.hpp
 								src/scenes/BaseScene.cpp
