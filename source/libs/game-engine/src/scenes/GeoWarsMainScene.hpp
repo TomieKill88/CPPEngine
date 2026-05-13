@@ -2,12 +2,17 @@
 
 #include "BaseScene.hpp"
 
+namespace GuiTools
+{
+	class ThirdGui;
+}
+
+
 namespace Scene
 {
 	class GeoWarsMainScene : public BaseScene
-	{
-		//GUIs
-		//std::unique_ptr<GuiTools::ThirdGui> mGuiTools;
+	{	
+		friend class GuiTools::ThirdGui;
 
 		// Actors
 		ActorManager::ActorManager mActorManager;

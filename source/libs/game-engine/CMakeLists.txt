@@ -28,8 +28,8 @@ list(APPEND game-engine_SOURCES  # sources
 								#src/guitools/FirstGui.cpp
 								#src/guitools/SecondGui.hpp
 								#src/guitools/SecondGui.cpp
-								#src/guitools/ThirdGui.hpp
-								#src/guitools/ThirdGui.cpp
+								src/guitools/ThirdGui.hpp
+								src/guitools/ThirdGui.cpp
 
 								# Scenes
 								src/scenes/BaseScene.hpp

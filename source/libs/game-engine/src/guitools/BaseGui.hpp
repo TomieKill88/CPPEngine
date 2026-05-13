@@ -21,7 +21,7 @@ namespace GuiTools
 	{
 	protected:
 
-		//GameEngine::GameEngine *mGameEngineInterface;
+		GameEngine::GameEngine *mGameEngineInterface;
 
 		bool shown = true;
 
@@ -31,7 +31,7 @@ namespace GuiTools
 	public:
 
 		BaseGui() = delete;
-		//BaseGui(GameEngine::GameEngine* gameEngineInterface);
+		BaseGui(GameEngine::GameEngine* gameEngineInterface);
 		virtual ~BaseGui() = default;
 
 		virtual void update() = 0;

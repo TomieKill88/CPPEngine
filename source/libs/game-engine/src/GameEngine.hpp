@@ -63,8 +63,13 @@ namespace GameEngine
 
 	class GameEngine
 	{		
+		friend class GuiTools::ThirdGui;
+
 		//Privates
-		nlohmann::json mConfigFile;		
+		nlohmann::json mConfigFile;	
+
+		//GUIs
+		std::unique_ptr<GuiTools::ThirdGui> mGuiTools;
 
 		// Scenes
 		std::map<std::string, std::shared_ptr<Scene::BaseScene>> mScenes;

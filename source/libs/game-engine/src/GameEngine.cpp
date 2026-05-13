@@ -34,7 +34,7 @@ namespace GameEngine
         mCurrentScene = std::make_shared<Scene::GeoWarsMainScene>(this);
         mScenes["Main"] = mCurrentScene;
 
-        //mGuiTools = std::make_unique<GuiTools::ThirdGui>(this);
+        mGuiTools = std::make_unique<GuiTools::ThirdGui>(this, std::dynamic_pointer_cast<Scene::GeoWarsMainScene>(mCurrentScene).get());
     }
 
     void GameEngine::init()
@@ -122,7 +122,7 @@ namespace GameEngine
         ImGui::SFML::Update(mWindow, mClock.restart());
 
         // Gui tool update begin - widgets - end
-        //mGuiTools->update();
+        mGuiTools->update();
 
         // Scene Update (systems)
         mCurrentScene->update();
