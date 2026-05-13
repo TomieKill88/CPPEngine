@@ -13,4 +13,4 @@ FetchContent_Declare(ImGui-SFML
 	EXCLUDE_FROM_ALL
 	SYSTEM)
 	
-FetchContent_MakeAvailable(ImGui-SFML)
+#FetchContent_MakeAvailable(ImGui-SFML)
