@@ -1,0 +1,48 @@
+{  
+  "window": {
+    "width": 780,
+    "height": 640,
+    "framerate": 60,
+    "fullscreen": false
+  },
+  "fonts": [
+    {
+      "file": "resources/AovelSans.ttf",
+      "size": 15,
+      "color": [ 255, 255, 255 ]
+    }
+  ],
+  "actors": {
+    "player": {
+      "radius": 30.0,
+      "collisionradius": 30.0,
+      "vertices": 4,
+      "speed": 5.0,
+      "fillcolor": [ 0, 0, 0 ],
+      "oulinecolor": [ 255, 255, 255 ],
+      "oulinethickness": 3,
+      "specialamount": 3,
+      "speciallifespan": 50,
+      "specialseparation": 10,
+      "specialcooldown": 300
+    },
+    "bullets": {
+      "radius": 5.0,
+      "collisionradius": 5.0,
+      "vertices": 20,
+      "speed": 2.0,
+      "fillcolor": [ 255, 255, 255 ],
+      "lifespan": 120
+    },
+    "enemies": {
+      "radius": 30.0,
+      "collisionradius": 30.0,
+      "minmaxvertices": [ 5, 8 ],
+      "minmaxspeed": [ -2.5, 2.5 ],
+      "outlinecolor": [ 255, 255, 255 ],
+      "outlinethickness": 3,
+      "lifespanminis": 50,
+      "spawninterval": 60
+    }
+  }
+}
