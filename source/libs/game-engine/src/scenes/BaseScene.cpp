@@ -8,15 +8,19 @@ namespace Scene
 	//{
 	//}
 
-	void BaseScene::update()
+	void BaseScene::registerAction(GameEngine::Input::InputCode pActionCode, ActionTypeEnum pActionType)
 	{
-		mFrameCounter++;
-		std::cout << "mFrameCounter: " << mFrameCounter << std::endl;
+		mActionMap[pActionCode] = pActionType;
 	}
 
-	void BaseScene::render()
+	bool BaseScene::hasAction(GameEngine::Input::InputCode action)
 	{
-		std::cout << "Rendering" << std::endl;
+		return (mActionMap.find(action) != mActionMap.end());
+	}
+
+	ActionTypeEnum BaseScene::getActionType(GameEngine::Input::InputCode code)
+	{
+		return mActionMap[code];
 	}
 
 	void BaseScene::simulate(int iterations)
@@ -25,5 +29,10 @@ namespace Scene
 		{
 			update();
 		}
+	}
+
+	void BaseScene::pause(bool pPause)
+	{
+		mPaused = pPause;
 	}
 }

@@ -32,8 +32,7 @@ namespace Components
 		exists = true;
 		mShape.setRadius(radius);
 		mShape.setPointCount(pointCount);
-		//mShape.setOrigin(mShape.getLocalBounds().getCenter());
-		mShape.setOrigin(mShape.getGeometricCenter());
+		mShape.setOrigin(mShape.getLocalBounds().getCenter());
 	}
 
 	CLifespan::CLifespan(int lifeFrames) : mLifeFrames(lifeFrames), mRemainingFrames(lifeFrames)

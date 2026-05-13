@@ -10,72 +10,67 @@
 
 namespace GameEngine
 {
+	struct sWindowData
+	{
+		int width = 0;
+		int height = 0;
+		int framerate = 0;
+		bool fullscreen = false;
+	};
+
+	struct sActorData
+	{
+		float radius = 0.0;
+		float collisionradius = 0.0;
+		int vertices = 0;
+		float speed = 0.0;
+		sf::Color fillcolor = sf::Color::White;
+		sf::Color outlinecolor = sf::Color::White;
+		int outlinethickness = 0;
+		int specialAmount = 0;
+		int specialLifespan = 0;
+		int specialSeparation = 0;
+		int specialCooldown = 0;
+	};
+
+	struct sBulletData
+	{
+		float radius = 0.0;
+		float collisionradius = 0.0;
+		int vertices = 0;
+		float speed = 0.0;
+		sf::Color fillcolor = sf::Color::White;
+		int lifespan = 0;
+	};
+
+	struct sEnemyData
+	{
+		float radius = 0.0;
+		float collisionradius = 0.0;
+		int vertices[2] = { 0, 0 };
+		float speed[2] = { 0.0, 0.0 };
+		sf::Color outlinecolor = sf::Color::Red;
+		int outlinethickness = 0;
+		int lifespanminis = 0;
+		int spanwinterval = -1;
+	};
+
 	class GameEngine
 	{
-		struct sWindowData
-		{
-			int width = 0;
-			int height = 0;
-			int framerate = 0;
-			bool fullscreen = false;
-		};
-
-		struct sActorData
-		{
-			float radius = 0.0;
-			float collisionradius = 0.0;
-			int vertices = 0;
-			float speed = 0.0;
-			sf::Color fillcolor = sf::Color::White;
-			sf::Color outlinecolor = sf::Color::White;
-			int outlinethickness = 0;
-			int specialAmount = 0;
-			int specialLifespan = 0;
-			int specialSeparation = 0;
-			int specialCooldown = 0;
-		};
-
-		struct sBulletData
-		{
-			float radius = 0.0;
-			float collisionradius = 0.0;
-			int vertices = 0;
-			float speed = 0.0;
-			sf::Color fillcolor = sf::Color::White;
-			int lifespan = 0;
-		};
-
-		struct sEnemyData
-		{
-			float radius = 0.0;
-			float collisionradius = 0.0;
-			int vertices[2] = { 0, 0 };
-			float speed[2] = { 0.0, 0.0 };
-			sf::Color outlinecolor = sf::Color::Red;
-			int outlinethickness = 0;
-			int lifespanminis = 0;
-			int spanwinterval = -1;
-		};
-
+		
 		//Privates
 		sf::Font font;
 		sf::Vector2i mMouseCapture;
 
 		int mFrameCounter = 0;
 		nlohmann::json mConfigFile;
-		sWindowData mWindowData;
-		sActorData mActorData;
-		sBulletData mBulletData;
-		sEnemyData mEnemyData;
 		
 
 		// Scenes
-		std::map<std::string, Scene::BaseScene> mScenes;
-		std::string	mCurrentScene;
+		std::map<std::string, std::shared_ptr<Scene::BaseScene>> mScenes;
+		std::shared_ptr<Scene::BaseScene> mCurrentScene;
 
-		//Vector<assests>
 		
-		//Actions
 		
 		//GUIs
 		std::unique_ptr<GuiTools::SecondGui> mGuiTools;
@@ -86,6 +81,12 @@ namespace GameEngine
 		bool mIsRunning = false;
 
 	public:
+
+		//Vector<assests>
+		sWindowData mWindowData;
+		sActorData mActorData;
+		sBulletData mBulletData;
+		sEnemyData mEnemyData;
 
 		// Actors
 		ActorManager::ActorManager mActorManager;
@@ -116,7 +117,7 @@ namespace GameEngine
 
 
 		// TEMP -> to move later
-		int MAX_ENEMY_SPAN = 10;
+		int MAX_ENEMY_SPAN = 1;
 		int INVINCIBILITY_FRAMES = 180;
 		int activeEnemies = 0;
 		int invincible = -1;

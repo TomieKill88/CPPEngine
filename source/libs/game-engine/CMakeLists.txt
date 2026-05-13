@@ -32,10 +32,18 @@ list(APPEND game-engine_SOURCES  # sources
 								# Scenes
 								src/scenes/BaseScene.hpp
 								src/scenes/BaseScene.cpp
+								src/scenes/GeoWarsMainScene.hpp
+								src/scenes/GeoWarsMainScene.cpp
+								src/scenes/ActionType.hpp
+								src/scenes/ActionType.cpp
+								src/scenes/Action.hpp
+								src/scenes/Action.cpp
 								
 								# Engine
 								src/GameEngine.hpp
 								src/GameEngine.cpp
+								src/InputCodes.hpp
+								src/InputCodes.cpp
 )
 
 target_sources(${TARGET_NAME} PRIVATE ${game-engine_SOURCES})

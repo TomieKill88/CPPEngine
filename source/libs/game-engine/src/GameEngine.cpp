@@ -11,19 +11,17 @@
 
 
 #include "GameEngine.hpp"
+#include "InputCodes.hpp"
 #include "actorfactory/ActorType.hpp"
 #include "src/general/Random.hpp"
+#include "scenes/GeoWarsMainScene.hpp"
+#include "scenes/Action.hpp"
 
 
 namespace GameEngine
 {
     GameEngine::GameEngine()
     {   
-        // Scene Map
-        //mCurrentScene = "BaseScene";
-        //Scene::BaseScene baseScene(this);
-        //mScenes[mCurrentScene] = baseScene;
-
         init();
 
         mIsRunning = ImGui::SFML::Init(mWindow);
@@ -33,13 +31,16 @@ namespace GameEngine
             return;
         }
 
+        mCurrentScene = std::make_shared<Scene::GeoWarsMainScene>(this);
+        mScenes["Main"] = mCurrentScene;
+
         mGuiTools = std::make_unique<GuiTools::SecondGui>(this);
     }
 
     void GameEngine::init()
     {
         try
-        {
+        { 
             // Read config file
             std::ifstream f("config/appconfig.json");
             mConfigFile = nlohmann::json::parse(f);
@@ -94,7 +95,7 @@ namespace GameEngine
             componentShape.mShape.setOutlineThickness(mActorData.outlinethickness);
             componentShape.mShape.setPosition(sf::Vector2f(windowSize.x / 2, windowSize.y / 2));
             // COMPONENT.SHAPE::label
-            componentShape.mLabel.setString(sf::String(""));
+            componentShape.mLabel.setString(sf::String("player"));
             componentShape.mLabel.setCharacterSize(mConfigFile["fonts"][0]["size"].get<int>());
             componentShape.mLabel.setFillColor(sf::Color(mConfigFile["fonts"][0]["color"][0].get<int>(),
                                                          mConfigFile["fonts"][0]["color"][1].get<int>(),
@@ -159,7 +160,7 @@ namespace GameEngine
         auto enemies = mActorManager.getActorsOfType(Actor::ActorTypeEnum::ENEMY);
         auto minis = mActorManager.getActorsOfType(Actor::ActorTypeEnum::ENEMY_MINI);
         auto bullets = mActorManager.getActorsOfType(Actor::ActorTypeEnum::BULLET);
-        auto shields = mActorManager.getActorsOfType(Actor::ActorTypeEnum::SHIELD);
+        auto shield = mActorManager.getActorsOfType(Actor::ActorTypeEnum::SHIELD);
 
         // PLAYER 
         if (player->get<Components::CInput>().mShoot)
@@ -202,18 +203,6 @@ namespace GameEngine
                     activeEnemies -= 1;
                     break; // break because enemy was destroyed, no need to check with any other bullet
                 }               
-            }
-
-            for each(auto shield in shields)
-            {
-                if (sCollision(enemy, shield))
-                {
-                    std::cout << "COLLISION!: " << shield->getTagString() << " " << enemy->getTagString() << std::endl;
-                    enemy->get<Components::CTransform>().speed.x *= -1;
-                    enemy->get<Components::CTransform>().speed.y *= -1;
-                    shield->remove<Components::CCollision>();
-                    break;
-                }
             }
         }
 
@@ -260,15 +249,13 @@ namespace GameEngine
                 continue;
 
             if (actor->has<Components::CLifespan>())
-            {                
+            {
                 int initial = actor->get<Components::CLifespan>().mLifeFrames;
-                actor->get<Components::CLifespan>().mRemainingFrames -= 1;
-                int remain = actor->get<Components::CLifespan>().mRemainingFrames;
+                int remain = actor->get<Components::CLifespan>().mRemainingFrames -= 1;
                 sf::Color color = actor->get<Components::CShape>().mShape.getFillColor();
                 sf::Color out = actor->get<Components::CShape>().mShape.getOutlineColor();
-                if(actor->getTag() != Actor::ActorTypeEnum::SHIELD)
-                    color.a = 255 * ((float)remain / initial);
-                out.a = 255 * ((float)remain / initial);
+                color.a = 255.0 * ((float)remain / initial);
+                out.a = 255.0 * ((float)remain / initial);
                 actor->get<Components::CShape>().mShape.setFillColor(color);
                 actor->get<Components::CShape>().mShape.setOutlineColor(out);
                 if (remain <= 0)
@@ -276,13 +263,16 @@ namespace GameEngine
                     mActorManager.destroyActor(actor->getId());
                     continue;
                 }
-
             }
 
             if (actor->getTag() == Actor::ActorTypeEnum::SHIELD)
             {
                 auto& shape = actor->get<Components::CShape>().mShape;
                 shape.setPosition(player->get<Components::CShape>().mShape.getPosition());
+                shape.setOutlineThickness(shape.getOutlineThickness() + 0.1);
+                shape.setRadius(shape.getRadius() + 0.5);
+                actor->get<Components::CCollision>().mRadius += 0.5;
+                continue;
             }
 
             sMovement(actor);
@@ -293,16 +283,7 @@ namespace GameEngine
         if(invincible > 0)
             invincible--;
         if (cooldown > 0)
-        {
             cooldown--;
-            int timeToRepeat = cooldown / 60;
-            player->get<Components::CShape>().mLabel.setString(sf::String(std::to_string(timeToRepeat).c_str()));
-        }
-        else
-        {
-            player->get<Components::CShape>().mLabel.setString(sf::String(""));
-        }
-            
     }
 
     void GameEngine::render()
@@ -354,10 +335,12 @@ namespace GameEngine
             }
 
             // Update Widgets - Update Scene State(systems, ActorManager)
+            mCurrentScene->update();
             update();
 
             // Render Widgets - Render Scene State
             render();
+            mCurrentScene->sRender();
 
             mFrameCounter++;
         }
@@ -375,13 +358,13 @@ namespace GameEngine
 
     void GameEngine::changeScene(std::string& newScene)
     {
-        if (mScenes.find(newScene) == mScenes.end())
+        /*if (mScenes.find(newScene) == mScenes.end())
         {
             std::cout << "ERROR: " << newScene << " is not an existing scene." << std::endl;
             return;
         }
 
-        mCurrentScene = newScene;
+        mCurrentScene = newScene;*/
 
     }
 
@@ -493,28 +476,60 @@ namespace GameEngine
 
         if (const auto *keyPressed = event.getIf<sf::Event::KeyPressed>())
         {
+            if (mCurrentScene->hasAction(Input::getInputKeyboard(keyPressed->scancode)))
+            {
+                Scene::Action action(Scene::ActionStateEnum::START, mCurrentScene->getActionType(Input::getInputKeyboard(keyPressed->scancode)));
+                mCurrentScene->doAction(action);
+            }
             if (keyPressed->scancode == sf::Keyboard::Scancode::W || keyPressed->scancode == sf::Keyboard::Scancode::Up)
+            {
                 player->get<Components::CInput>().mUp = 1;
+            }                
             else if (keyPressed->scancode == sf::Keyboard::Scancode::S || keyPressed->scancode == sf::Keyboard::Scancode::Down)
+            {
                 player->get<Components::CInput>().mDown = 1;
+            }                
             else if (keyPressed->scancode == sf::Keyboard::Scancode::A || keyPressed->scancode == sf::Keyboard::Scancode::Left)
+            {
                 player->get<Components::CInput>().mLeft = 1;
+            }                
             else if (keyPressed->scancode == sf::Keyboard::Scancode::D || keyPressed->scancode == sf::Keyboard::Scancode::Right)
+            {
                 player->get<Components::CInput>().mRight = 1;
+            }
         }
         else if (const auto* keyPressed = event.getIf<sf::Event::KeyReleased>())
         {
+            if (mCurrentScene->hasAction(Input::getInputKeyboard(keyPressed->scancode)))
+            {
+                Scene::Action action(Scene::ActionStateEnum::END, mCurrentScene->getActionType(Input::getInputKeyboard(keyPressed->scancode)));
+                mCurrentScene->doAction(action);
+            }
             if (keyPressed->scancode == sf::Keyboard::Scancode::W || keyPressed->scancode == sf::Keyboard::Scancode::Up)
+            {
                 player->get<Components::CInput>().mUp = 0;
+            }               
             else if (keyPressed->scancode == sf::Keyboard::Scancode::S || keyPressed->scancode == sf::Keyboard::Scancode::Down)
+            {
                 player->get<Components::CInput>().mDown = 0;
+            }                
             else if (keyPressed->scancode == sf::Keyboard::Scancode::A || keyPressed->scancode == sf::Keyboard::Scancode::Left)
+            {
                 player->get<Components::CInput>().mLeft = 0;
+            }                
             else if (keyPressed->scancode == sf::Keyboard::Scancode::D || keyPressed->scancode == sf::Keyboard::Scancode::Right)
+            {
                 player->get<Components::CInput>().mRight = 0;
+            }
+                
         }
         else if (const auto* buttonPressed = event.getIf<sf::Event::MouseButtonPressed>())
         {
+            if (mCurrentScene->hasAction(Input::getInputMouse(buttonPressed->button)))
+            {
+                Scene::Action action(Scene::ActionStateEnum::START, mCurrentScene->getActionType(Input::getInputMouse(buttonPressed->button)));
+                mCurrentScene->doAction(action);
+            }
             if (buttonPressed->button == sf::Mouse::Button::Left)
             {
                 mMouseCapture = sf::Mouse::getPosition(mWindow);
@@ -555,12 +570,12 @@ namespace GameEngine
             componentShape.mShape.setPosition(sf::Vector2f(x, y));
 
             // COMPONENT.SHAPE::label
-            componentShape.mLabel.setString(sf::String(""));
-            //componentShape.mLabel.setCharacterSize(mConfigFile["fonts"][0]["size"].get<int>());
-            //componentShape.mLabel.setFillColor(sf::Color(mConfigFile["fonts"][0]["color"][0].get<int>(),
-            //    mConfigFile["fonts"][0]["color"][1].get<int>(),
-            //    mConfigFile["fonts"][0]["color"][2].get<int>()));
-            //componentShape.mLabel.setOrigin(componentShape.mLabel.getLocalBounds().getCenter());
+            componentShape.mLabel.setString(sf::String("enemy"));
+            componentShape.mLabel.setCharacterSize(mConfigFile["fonts"][0]["size"].get<int>());
+            componentShape.mLabel.setFillColor(sf::Color(mConfigFile["fonts"][0]["color"][0].get<int>(),
+                mConfigFile["fonts"][0]["color"][1].get<int>(),
+                mConfigFile["fonts"][0]["color"][2].get<int>()));
+            componentShape.mLabel.setOrigin(componentShape.mLabel.getLocalBounds().getCenter());
             // MUST set Font here or else the reference is lost for some reason
             componentShape.mLabel.setFont(componentShape.mFont);
 
@@ -676,12 +691,6 @@ namespace GameEngine
 
     void GameEngine::sSpecial(ActorManager::ActorPtr actor)
     {
-        if (cooldown > 0)
-        {
-            specials = 0;
-            return;
-        }
-
         if (wait == 0)
         {
             float x = actor->get<Components::CShape>().mShape.getPosition().x;
@@ -691,12 +700,10 @@ namespace GameEngine
             shield->add<Components::CTransform>(Tools::Science::Vec2(x, y),
                 Tools::Science::Vec2(mActorData.speed, mActorData.speed));
 
-            float radius = mActorData.radius + mActorData.specialSeparation * (1 + mActorData.specialAmount - specials);
-            int thick = 2 * mActorData.outlinethickness * (mActorData.specialAmount - specials);
-            auto& componentShape = shield->add<Components::CShape>(radius, font, mActorData.vertices);
+            auto& componentShape = shield->add<Components::CShape>(mActorData.radius, font, mActorData.vertices);
             componentShape.mShape.setFillColor(sf::Color(0, 0, 0, 0));
-            componentShape.mShape.setOutlineColor(sf::Color(108, 187, 209)); // electric teal
-            componentShape.mShape.setOutlineThickness(thick);
+            componentShape.mShape.setOutlineColor(sf::Color(8, 87, 109)); // electric teal
+            componentShape.mShape.setOutlineThickness(mActorData.outlinethickness);
             componentShape.mShape.setPosition(sf::Vector2f(x, y));
             // COMPONENT.SHAPE::label
             componentShape.mLabel.setString(sf::String(""));
@@ -704,11 +711,11 @@ namespace GameEngine
             componentShape.mLabel.setFont(componentShape.mFont);
 
             //COMPONENT.COLLISION
-            shield->add<Components::CCollision>(radius);
+            shield->add<Components::CCollision>(mActorData.collisionradius);
 
             //COMPONENT.LIFESPAN
             shield->add<Components::CLifespan>(mActorData.specialLifespan);
-            
+
             specials--;
             wait = mActorData.specialSeparation;
         }
