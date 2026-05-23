@@ -3,10 +3,14 @@
 #include <SFML/Graphics.hpp>
 #include <nlohmann/json.hpp>
 
-#include "guitools/ThirdGui.hpp"
 #include "scenes/BaseScene.hpp"
 #include "actorfactory/ActorManager.hpp"
 #include "actorfactory/Actor.hpp"
+
+namespace GuiTools
+{
+	class ThirdGui;
+}
 
 namespace GameEngine
 {
@@ -67,9 +71,6 @@ namespace GameEngine
 
 		//Privates
 		nlohmann::json mConfigFile;	
-
-		//GUIs
-		std::unique_ptr<GuiTools::ThirdGui> mGuiTools;
 
 		// Scenes
 		std::map<std::string, std::shared_ptr<Scene::BaseScene>> mScenes;

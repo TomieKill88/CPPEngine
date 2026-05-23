@@ -1,6 +1,7 @@
 #pragma once
 
 #include "BaseScene.hpp"
+#include "guitools/ThirdGui.hpp"
 
 namespace GuiTools
 {
@@ -13,6 +14,8 @@ namespace Scene
 	class GeoWarsMainScene : public BaseScene
 	{	
 		friend class GuiTools::ThirdGui;
+		//GUIs
+		std::unique_ptr<GuiTools::ThirdGui> mGuiTools;
 
 		// Actors
 		ActorManager::ActorManager mActorManager;

@@ -108,12 +108,18 @@ namespace Scene
 	GeoWarsMainScene::GeoWarsMainScene(GameEngine::GameEngine* gameEngine) : BaseScene(gameEngine)
 	{
         registerActions();
-        createPlayer();        
+        createPlayer();
+
+
+        mGuiTools = std::make_unique<GuiTools::ThirdGui>(gameEngine, this);
 	}
 
 
 	void GeoWarsMainScene::update() 
 	{
+        // Gui tool update begin - widgets - end
+        mGuiTools->update();
+         
         // Update Actors
         mActorManager.update();
 
@@ -136,9 +142,7 @@ namespace Scene
         else
         {
             mPlayer->get<Components::CShape>().mLabel.setString(sf::String(""));
-        }
-
-            
+        }            
 
         sCollision();
 
@@ -250,7 +254,7 @@ namespace Scene
                 auto& shape = actor->get<Components::CShape>();
 
                 mGameEngine->getWindow().draw(shape.mShape);
-                mGameEngine->getWindow().draw(shape.mLabel);
+                //mGameEngine->getWindow().draw(shape.mLabel);
 
                 //for debugging
                 auto& coll = actor->get<Components::CCollision>();
