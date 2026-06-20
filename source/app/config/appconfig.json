@@ -1,26 +1,54 @@
-{  
+{
   "window": {
     "width": 780,
     "height": 640,
     "framerate": 60,
     "fullscreen": false
   },
-  "fonts": [
-    {
-      "file": "resources/AovelSans.ttf",
-      "size": 15,
-      "color": [ 255, 255, 255 ]
-    }
-  ],
+  "resources": {
+    "fonts": [
+      {
+        "name": "Aovel",
+        "file": "resources/fonts/AovelSans.ttf",
+        "size": 15,
+        "color": [ 255, 255, 255 ]
+      }
+    ],
+    "textures": [
+      {
+        "name": "Circles",
+        "file": "resources/sprites/circles.png",
+        "size": [ 256, 64 ],
+        "sprites": [
+          {
+            "name": "Circle1",
+            "size": [ 64, 64 ],
+            "position": [ 0, 0 ]
+          },
+          {
+            "name": "Circle2",
+            "size": [ 64, 64 ],
+            "position": [ 64, 0 ]
+          },
+          {
+            "name": "Circle3",
+            "size": [ 64, 64 ],
+            "position": [ 128, 0 ]
+          },
+          {
+            "name": "Circle4",
+            "size": [ 64, 64 ],
+            "position": [ 192, 0 ]
+          }
+        ]
+      }
+    ]
+  },
   "actors": {
     "player": {
-      "radius": 30.0,
+      "sprite": "Circle4",
       "collisionradius": 30.0,
-      "vertices": 4,
       "speed": 5.0,
-      "fillcolor": [ 0, 0, 0 ],
-      "oulinecolor": [ 255, 255, 255 ],
-      "oulinethickness": 3,
       "specialamount": 3,
       "speciallifespan": 50,
       "specialseparation": 10,

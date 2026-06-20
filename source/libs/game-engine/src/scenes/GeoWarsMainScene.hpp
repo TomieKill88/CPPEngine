@@ -1,20 +1,30 @@
 #pragma once
 
 #include "BaseScene.hpp"
+#include <nlohmann/json.hpp>
+
+namespace GuiTools
+{
+	class ThirdGui;
+}
+
 
 namespace Scene
 {
 	class GeoWarsMainScene : public BaseScene
-	{
-		//GUIs
-		//std::unique_ptr<GuiTools::ThirdGui> mGuiTools;
+	{	
+		friend class GuiTools::ThirdGui;
+
+		//Privates
+		nlohmann::json mConfigFile;
 
 		// Actors
-		ActorManager::ActorManager mActorManager;
+		//ActorManager::ActorManager mActorManager;
 		ActorManager::ActorPtr mPlayer;
 
+		void init();
 		void registerActions();
-		void createPlayer();
+		void createPlayer(Tools::Science::Vec2& position);
 
 		// SYSTEMS VARS
 		int MAX_ENEMY_SPAN = 1;
@@ -28,6 +38,7 @@ namespace Scene
 		bool msInvincibleColor = false;
 		int msActiveEnemies = 0;
 		// SYSTEMS HELPERS
+		void shEnemySpawner(Tools::Science::Vec2& position);
 		void shSmallEnemySpawner(ActorManager::ActorPtr enemyDestroyed);
 		bool shCheckCollision(ActorManager::ActorPtr mainActor, ActorManager::ActorPtr secondaryActor);
 

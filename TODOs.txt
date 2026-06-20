@@ -1,0 +1,7 @@
+- Update CTransform so it is actually the component handling the position and speed of character. Having it
+depend on Shape/Sprite makes combining both a bit difficult
+- Change the Config file so player config is read from each scene
+- Change Sprite initialization to set origin at center (somehow...)
+- AssetClass
+- CAnimation
+- Sounds 

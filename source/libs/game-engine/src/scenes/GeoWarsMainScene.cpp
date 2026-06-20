@@ -1,3 +1,5 @@
+#include <fstream>
+
 #include <SFML/Graphics.hpp>
 
 #include "GeoWarsMainScene.hpp"
@@ -6,6 +8,21 @@
 
 namespace Scene
 {
+    void GeoWarsMainScene::init()
+    {
+        std::ifstream levelConfig("config/geowarsmainconfig.json");
+        mConfigFile = nlohmann::json::parse(levelConfig);
+
+        Tools::Science::Vec2 playerPosition = { mConfigFile["actors"]["player"]["position"][0].get<float>(), mConfigFile["actors"]["player"]["position"][1].get<float>() };
+        createPlayer(playerPosition);
+
+        shEnemySpawner(Tools::Science::Vec2(mConfigFile["actors"]["enemies"]["position"][0][0].get<int>(), mConfigFile["actors"]["enemies"]["position"][0][1].get<int>()));
+        shEnemySpawner(Tools::Science::Vec2(mConfigFile["actors"]["enemies"]["position"][1][0].get<int>(), mConfigFile["actors"]["enemies"]["position"][1][1].get<int>()));
+        shEnemySpawner(Tools::Science::Vec2(mConfigFile["actors"]["enemies"]["position"][2][0].get<int>(), mConfigFile["actors"]["enemies"]["position"][2][1].get<int>()));
+        shEnemySpawner(Tools::Science::Vec2(mConfigFile["actors"]["enemies"]["position"][3][0].get<int>(), mConfigFile["actors"]["enemies"]["position"][3][1].get<int>()));
+        shEnemySpawner(Tools::Science::Vec2(mConfigFile["actors"]["enemies"]["position"][4][0].get<int>(), mConfigFile["actors"]["enemies"]["position"][4][1].get<int>()));
+    }
+
     void GeoWarsMainScene::registerActions()
     {
         registerAction(GameEngine::Input::InputCode::KEYBOARD_W, ActionTypeEnum::UP);
@@ -18,28 +35,24 @@ namespace Scene
         registerAction(GameEngine::Input::InputCode::KEYBOARD_RIGHT, ActionTypeEnum::RIGHT);
         registerAction(GameEngine::Input::InputCode::MOUSE_RIGHT, ActionTypeEnum::SPECIAL);
         registerAction(GameEngine::Input::InputCode::MOUSE_LEFT, ActionTypeEnum::SHOOT);
+
+        registerAction(GameEngine::Input::InputCode::KEYBOARD_ENTER, ActionTypeEnum::PAUSE);
     }
 
-    void GeoWarsMainScene::createPlayer()
+    void GeoWarsMainScene::createPlayer(Tools::Science::Vec2& position)
     {
-        mPlayer = mActorManager.createActor(Actor::ActorTypeEnum::PLAYER);
+        mPlayer = BaseScene::mActorManager.createActor(Actor::ActorTypeEnum::PLAYER);
         // COMPONENT.TRANSFORM
         mPlayer->add<Components::CTransform>(Tools::Science::Vec2(mGameEngine->mWindowData.width / 2, mGameEngine->mWindowData.height / 2),
             Tools::Science::Vec2(mGameEngine->mActorData.speed, mGameEngine->mActorData.speed));
 
         // COMPONENT.SHAPE
-        auto& componentShape = mPlayer->add<Components::CShape>(mGameEngine->mActorData.radius, mGameEngine->font, mGameEngine->mActorData.vertices);
-        componentShape.mShape.setFillColor(mGameEngine->mActorData.fillcolor);
-        componentShape.mShape.setOutlineColor(mGameEngine->mActorData.outlinecolor);
-        componentShape.mShape.setOutlineThickness(mGameEngine->mActorData.outlinethickness);
-        componentShape.mShape.setPosition(sf::Vector2f(mGameEngine->mWindowData.width / 2, mGameEngine->mWindowData.height / 2));
-        // COMPONENT.SHAPE::label
-        componentShape.mLabel.setString(sf::String("player"));
-        componentShape.mLabel.setCharacterSize(mGameEngine->mAssetsData.fontsize);
-        componentShape.mLabel.setFillColor(mGameEngine->mAssetsData.fontcolor);
-        componentShape.mLabel.setOrigin(componentShape.mLabel.getLocalBounds().getCenter());
-        // MUST set Font here or else the reference is lost for some reason
-        componentShape.mLabel.setFont(componentShape.mFont);
+        auto playerSprite = mGameEngine->getSpriteData(mGameEngine->mActorData.sprite);
+        auto& componentShape = mPlayer->add<Components::CShape>(32, 4);
+        componentShape.shape.setPosition(sf::Vector2f(position.x, position.y));
+        componentShape.shape.setTexture(playerSprite.texture, true);
+        componentShape.shape.setTextureRect(playerSprite.subrect);
+        componentShape.shape.rotate(sf::degrees(45));
 
         //COMPONENT.COLLISION
         mPlayer->add<Components::CCollision>(mGameEngine->mActorData.collisionradius);
@@ -51,9 +64,31 @@ namespace Scene
         mPlayer->add<Components::CInput>(0, 0, 0, 0, 0);
     }
 
+    void GeoWarsMainScene::shEnemySpawner(Tools::Science::Vec2& position)
+    {
+        auto enemy = BaseScene::mActorManager.createActor(Actor::ActorTypeEnum::ENEMY);
+
+        // COMPONENT.TRANSFORM
+        float speedx = Tools::General::random<float>(mGameEngine->mEnemyData.speed[0], mGameEngine->mEnemyData.speed[1]);
+        float speedy = Tools::General::random<float>(mGameEngine->mEnemyData.speed[0], mGameEngine->mEnemyData.speed[1]);
+        enemy->add<Components::CTransform>(position, Tools::Science::Vec2(speedx, speedy));
+
+        // COMPONENT.SHAPE
+        int v = Tools::General::random<int>(mGameEngine->mEnemyData.vertices[0], mGameEngine->mEnemyData.vertices[1]);
+        auto& componentShape = enemy->add<Components::CShape>(mGameEngine->mEnemyData.radius, v);
+        componentShape.shape.setFillColor(sf::Color::Black);
+        sf::Color color(Tools::General::random<int>(0, 200), Tools::General::random<int>(0, 200), Tools::General::random<int>(0, 200));
+        componentShape.shape.setOutlineColor(color);
+        componentShape.shape.setOutlineThickness(mGameEngine->mEnemyData.outlinethickness);
+        componentShape.shape.setPosition(sf::Vector2f(position.x, position.y));
+
+        //COMPONENT.COLLISION
+        enemy->add<Components::CCollision>(mGameEngine->mEnemyData.collisionradius);
+    }
+
     void GeoWarsMainScene::shSmallEnemySpawner(ActorManager::ActorPtr enemyDestroyed)
     {
-        auto enemyShape = enemyDestroyed->get<Components::CShape>().mShape;
+        auto enemyShape = enemyDestroyed->get<Components::CShape>().shape;
         int amount = enemyShape.getPointCount();
         float degrees = 360.0 / amount;
         auto spawnPoint = enemyShape.getPosition();
@@ -62,7 +97,7 @@ namespace Scene
 
         for (int i = 0; i < amount; i++)
         {
-            auto enemy = mActorManager.createActor(Actor::ActorTypeEnum::ENEMY_MINI);
+            auto enemy = BaseScene::mActorManager.createActor(Actor::ActorTypeEnum::ENEMY_MINI);
             Tools::Science::Vec2 speed;
             speed.polar(degrees * i, 1.0);
 
@@ -70,14 +105,9 @@ namespace Scene
             enemy->add<Components::CTransform>(Tools::Science::Vec2(spawnPoint.x, spawnPoint.y), speed);
 
             // COMPONENT.SHAPE
-            auto& componentShape = enemy->add<Components::CShape>(radius, mGameEngine->font, amount);
-            componentShape.mShape.setFillColor(color);
-            componentShape.mShape.setPosition(spawnPoint);
-
-            // COMPONENT.SHAPE::label
-            componentShape.mLabel.setString(sf::String(""));
-            // MUST set Font here or else the reference is lost for some reason
-            componentShape.mLabel.setFont(componentShape.mFont);
+            auto& componentShape = enemy->add<Components::CShape>(radius, amount);
+            componentShape.shape.setFillColor(color);
+            componentShape.shape.setPosition(spawnPoint);
 
             //COMPONENT.COLLISION
             enemy->add<Components::CCollision>(radius);
@@ -96,8 +126,8 @@ namespace Scene
         float mainRadius = mainActor->get<Components::CCollision>().mRadius;
         float secondRadius = secondaryActor->get<Components::CCollision>().mRadius;
 
-        auto mainActorPos = mainActor->get<Components::CShape>().mShape.getPosition();
-        auto secondActorPos = secondaryActor->get<Components::CShape>().mShape.getPosition();
+        auto mainActorPos = mainActor->get<Components::CShape>().shape.getPosition();
+        auto secondActorPos = secondaryActor->get<Components::CShape>().shape.getPosition();
 
         float distSquared = (secondActorPos.x - mainActorPos.x) * (secondActorPos.x - mainActorPos.x) +
             (secondActorPos.y - mainActorPos.y) * (secondActorPos.y - mainActorPos.y);
@@ -108,14 +138,14 @@ namespace Scene
 	GeoWarsMainScene::GeoWarsMainScene(GameEngine::GameEngine* gameEngine) : BaseScene(gameEngine)
 	{
         registerActions();
-        createPlayer();        
+        init();
 	}
 
 
 	void GeoWarsMainScene::update() 
 	{
         // Update Actors
-        mActorManager.update();
+        BaseScene::mActorManager.update();
 
         if (mPlayer->get<Components::CInput>().mShoot)
             sShoot(mPlayer); // Only the player shoots at the moment.
@@ -131,11 +161,11 @@ namespace Scene
         {
             msSpecialCooldown--;
             int timeToRepeat = msSpecialCooldown / 60;
-            mPlayer->get<Components::CShape>().mLabel.setString(sf::String(std::to_string(timeToRepeat).c_str()));
+            //mPlayer->get<Components::CShape>().mLabel.setString(sf::String(std::to_string(timeToRepeat).c_str()));
         }
         else
         {
-            mPlayer->get<Components::CShape>().mLabel.setString(sf::String(""));
+            //mPlayer->get<Components::CShape>().mLabel.setString(sf::String(""));
         }
 
             
@@ -143,10 +173,10 @@ namespace Scene
         sCollision();
 
         // MOVEMENT & WALLCOLLISION & LIFESPAN
-        auto activeActorIndex = mActorManager.getAllActors();
+        auto activeActorIndex = BaseScene::mActorManager.getAllActors();
         for each (auto active in activeActorIndex)
         {
-            auto& actor = mActorManager.getActor(active);
+            auto& actor = BaseScene::mActorManager.getActor(active);
 
             if (!actor->isAlive())
                 continue;
@@ -156,33 +186,33 @@ namespace Scene
                 int initial = actor->get<Components::CLifespan>().mLifeFrames;
                 int remain = actor->get<Components::CLifespan>().mRemainingFrames -= 1;
                 
-                sf::Color out = actor->get<Components::CShape>().mShape.getOutlineColor();
+                sf::Color out = actor->get<Components::CShape>().shape.getOutlineColor();
                 if (actor->getTag() != Actor::ActorTypeEnum::SHIELD)
                 {
-                    sf::Color color = actor->get<Components::CShape>().mShape.getFillColor();
+                    sf::Color color = actor->get<Components::CShape>().shape.getFillColor();
                     color.a = 255 * ((float)remain / initial);
-                    actor->get<Components::CShape>().mShape.setFillColor(color);
+                    actor->get<Components::CShape>().shape.setFillColor(color);
                 }                    
                 out.a = 255.0 * ((float)remain / initial);
-                actor->get<Components::CShape>().mShape.setOutlineColor(out);
+                actor->get<Components::CShape>().shape.setOutlineColor(out);
                 if (remain <= 0)
                 {
-                    mActorManager.destroyActor(actor->getId());
+                    BaseScene::mActorManager.destroyActor(actor->getId());
                     continue;
                 }
             }
 
             if (actor->getTag() == Actor::ActorTypeEnum::SHIELD)
             {
-                auto& shape = actor->get<Components::CShape>().mShape;
-                shape.setPosition(mPlayer->get<Components::CShape>().mShape.getPosition());
+                auto& shape = actor->get<Components::CShape>().shape;
+                shape.setPosition(mPlayer->get<Components::CShape>().shape.getPosition());
                 continue;
             }
             sMovement(actor);
             sWallCollision(actor);
         }
 
-        sEnemySpawner();        
+        //sEnemySpawner();        
 
         ++mFrameCounter;
     }
@@ -215,7 +245,7 @@ namespace Scene
             else if (pAction.getType() == ActionTypeEnum::SPECIAL)
             {
                 msSpecials = mGameEngine->mActorData.specialAmount;
-            }
+            }            
         }
         else if (pAction.getState() == ActionStateEnum::END)
         {
@@ -235,28 +265,32 @@ namespace Scene
             {
                 mPlayer->get<Components::CInput>().mRight = 0;
             }
+            else if (pAction.getType() == ActionTypeEnum::PAUSE)
+            {
+                mGameEngine->changeScene(std::string("Pause"));
+            }
 
         }
 	}
 	
     void GeoWarsMainScene::sRender() 
 	{
-        auto activeActors = mActorManager.getAllActors();
+        auto activeActors = BaseScene::mActorManager.getAllActors();
         for each (auto & active in activeActors)
         {
-            auto& actor = mActorManager.getActor(active);
+            auto& actor = BaseScene::mActorManager.getActor(active);
             if (actor->isAlive())
             {
                 auto& shape = actor->get<Components::CShape>();
-
-                mGameEngine->getWindow().draw(shape.mShape);
-                mGameEngine->getWindow().draw(shape.mLabel);
+                mGameEngine->getWindow().draw(shape.shape);
+                if (actor->getTag() == Actor::ActorTypeEnum::ENEMY)
+                    mGameEngine->getWindow().draw(actor->renderTagString(mGameEngine->mFontsData.font));
 
                 //for debugging
                 auto& coll = actor->get<Components::CCollision>();
                 if (coll.mDraw)
                 {
-                    coll.mShape.setPosition(shape.mShape.getPosition());
+                    coll.mShape.setPosition(shape.shape.getPosition());
                     mGameEngine->getWindow().draw(coll.mShape);
                 }
             }
@@ -282,27 +316,22 @@ namespace Scene
                 vertical *= 0.714;
             }
 
-            shape.mShape.move(sf::Vector2f{ transform.speed.x * horizontal, transform.speed.y * vertical });
+            shape.shape.move(sf::Vector2f{ transform.speed.x * horizontal, transform.speed.y * vertical });
         }
         else
         {
-            shape.mShape.move(sf::Vector2f{ transform.speed.x, transform.speed.y });
-        }
-        shape.mLabel.setPosition(shape.mShape.getGlobalBounds().getCenter());
-
-        // player is done. Only enemies rotate
-        if (type == Actor::ActorTypeEnum::PLAYER || type == Actor::ActorTypeEnum::SHIELD)
-            return;
-
-        shape.mShape.rotate(sf::degrees(5));
+            shape.shape.move(sf::Vector2f{ transform.speed.x, transform.speed.y });
+            if (type == Actor::ActorTypeEnum::ENEMY)
+                shape.shape.rotate(sf::degrees(5));
+        }                
     }
 
     void GeoWarsMainScene::sCollision()
     {
-        auto enemies = mActorManager.getActorsOfType(Actor::ActorTypeEnum::ENEMY);
-        auto minis = mActorManager.getActorsOfType(Actor::ActorTypeEnum::ENEMY_MINI);
-        auto bullets = mActorManager.getActorsOfType(Actor::ActorTypeEnum::BULLET);
-        auto shields = mActorManager.getActorsOfType(Actor::ActorTypeEnum::SHIELD);
+        auto enemies = BaseScene::mActorManager.getActorsOfType(Actor::ActorTypeEnum::ENEMY);
+        auto minis = BaseScene::mActorManager.getActorsOfType(Actor::ActorTypeEnum::ENEMY_MINI);
+        auto bullets = BaseScene::mActorManager.getActorsOfType(Actor::ActorTypeEnum::BULLET);
+        auto shields = BaseScene::mActorManager.getActorsOfType(Actor::ActorTypeEnum::SHIELD);
 
         // ENEMY COLLISIONS
         for each (auto & enemy in enemies)
@@ -316,8 +345,8 @@ namespace Scene
                 if (shCheckCollision(mPlayer, enemy))
                 {
                     auto spawnPos = mPlayer->get<Components::CTransform>().position;
-                    mPlayer->get<Components::CShape>().mShape.setPosition(sf::Vector2f(spawnPos.x, spawnPos.y));
-                    mActorManager.destroyActor(enemy->getId());
+                    mPlayer->get<Components::CShape>().shape.setPosition(sf::Vector2f(spawnPos.x, spawnPos.y));
+                    BaseScene::mActorManager.destroyActor(enemy->getId());
                     msInvincible = INVINCIBILITY_FRAMES;
                     msActiveEnemies -= 1;
                     continue;
@@ -332,8 +361,8 @@ namespace Scene
                 if (shCheckCollision(enemy, bullet))
                 {
                     shSmallEnemySpawner(enemy);
-                    mActorManager.destroyActor(enemy->getId());
-                    mActorManager.destroyActor(bullet->getId());
+                    BaseScene::mActorManager.destroyActor(enemy->getId());
+                    BaseScene::mActorManager.destroyActor(bullet->getId());
                     msActiveEnemies -= 1;
                     break; // break because enemy was destroyed, no need to check with any other bullet
                 }
@@ -362,8 +391,8 @@ namespace Scene
                 if (shCheckCollision(mPlayer, mini))
                 {
                     auto spawnPos = mPlayer->get<Components::CTransform>().position;
-                    mPlayer->get<Components::CShape>().mShape.setPosition(sf::Vector2f(spawnPos.x, spawnPos.y));
-                    mActorManager.destroyActor(mini->getId());
+                    mPlayer->get<Components::CShape>().shape.setPosition(sf::Vector2f(spawnPos.x, spawnPos.y));
+                    BaseScene::mActorManager.destroyActor(mini->getId());
                     msInvincible = INVINCIBILITY_FRAMES;
                     continue;
                 }
@@ -376,8 +405,8 @@ namespace Scene
 
                 if (shCheckCollision(mini, bullet))
                 {
-                    mActorManager.destroyActor(mini->getId());
-                    mActorManager.destroyActor(bullet->getId());
+                    BaseScene::mActorManager.destroyActor(mini->getId());
+                    BaseScene::mActorManager.destroyActor(bullet->getId());
                     break; // break because bullet was destroyed, no need to check with any other enemy
                 }
             }
@@ -395,18 +424,18 @@ namespace Scene
         actorRadiusSquared *= actorRadiusSquared;
         auto& transform = actor->get<Components::CTransform>();
         auto& shape = actor->get<Components::CShape>();
-        auto pos = shape.mShape.getPosition();
+        auto pos = shape.shape.getPosition();
 
         if (actor->getTag() == Actor::ActorTypeEnum::PLAYER)
         {
             if (((pos.x - 0) * (pos.x - 0)) < actorRadiusSquared)
-                shape.mShape.setPosition(sf::Vector2f(shape.mShape.getGeometricCenter().x, pos.y));
+                shape.shape.setPosition(sf::Vector2f(shape.shape.getGeometricCenter().x, pos.y));
             else if (((pos.x - mGameEngine->getWindow().getSize().x) * (pos.x - mGameEngine->getWindow().getSize().x)) < actorRadiusSquared)
-                shape.mShape.setPosition(sf::Vector2f(mGameEngine->getWindow().getSize().x - shape.mShape.getGeometricCenter().x, pos.y));
+                shape.shape.setPosition(sf::Vector2f(mGameEngine->getWindow().getSize().x - shape.shape.getGeometricCenter().x, pos.y));
             if (((pos.y - 0) * (pos.y - 0)) < actorRadiusSquared)
-                shape.mShape.setPosition(sf::Vector2f(pos.x, shape.mShape.getGeometricCenter().y));
+                shape.shape.setPosition(sf::Vector2f(pos.x, shape.shape.getGeometricCenter().y));
             else if (((pos.y - mGameEngine->getWindow().getSize().y) * (pos.y - mGameEngine->getWindow().getSize().y)) < actorRadiusSquared)
-                shape.mShape.setPosition(sf::Vector2f(pos.x, mGameEngine->getWindow().getSize().y - shape.mShape.getGeometricCenter().y));
+                shape.shape.setPosition(sf::Vector2f(pos.x, mGameEngine->getWindow().getSize().y - shape.shape.getGeometricCenter().y));
         }
         else
         {
@@ -425,36 +454,11 @@ namespace Scene
 
         if (mFrameCounter % mGameEngine->mEnemyData.spanwinterval == 0)
         {
-            auto enemy = mActorManager.createActor(Actor::ActorTypeEnum::ENEMY);
             // +-50.0 so enemies don't spawn touching the borders
             float x = Tools::General::random<float>(50.0f, (float)(mGameEngine->getWindow().getSize().x) - 50.0f);
             float y = Tools::General::random<float>(50.0f, (float)(mGameEngine->getWindow().getSize().y) - 50.0f);
 
-            // COMPONENT.TRANSFORM
-            float speedx = Tools::General::random<float>(mGameEngine->mEnemyData.speed[0], mGameEngine->mEnemyData.speed[1]);
-            float speedy = Tools::General::random<float>(mGameEngine->mEnemyData.speed[0], mGameEngine->mEnemyData.speed[1]);
-            enemy->add<Components::CTransform>(Tools::Science::Vec2(x, y),
-                Tools::Science::Vec2(speedx, speedy));
-
-            // COMPONENT.SHAPE
-            int v = Tools::General::random<int>(mGameEngine->mEnemyData.vertices[0], mGameEngine->mEnemyData.vertices[1]);
-            auto& componentShape = enemy->add<Components::CShape>(mGameEngine->mEnemyData.radius, mGameEngine->font, v);
-            componentShape.mShape.setFillColor(sf::Color::Black);
-            sf::Color color(Tools::General::random<int>(0, 200), Tools::General::random<int>(0, 200), Tools::General::random<int>(0, 200));
-            componentShape.mShape.setOutlineColor(color);
-            componentShape.mShape.setOutlineThickness(mGameEngine->mEnemyData.outlinethickness);
-            componentShape.mShape.setPosition(sf::Vector2f(x, y));
-
-            // COMPONENT.SHAPE::label
-            componentShape.mLabel.setString(sf::String("enemy"));
-            componentShape.mLabel.setCharacterSize(mGameEngine->mAssetsData.fontsize);
-            componentShape.mLabel.setFillColor(mGameEngine->mAssetsData.fontcolor);
-            componentShape.mLabel.setOrigin(componentShape.mLabel.getLocalBounds().getCenter());
-            // MUST set Font here or else the reference is lost for some reason
-            componentShape.mLabel.setFont(componentShape.mFont);
-
-            //COMPONENT.COLLISION
-            enemy->add<Components::CCollision>(mGameEngine->mEnemyData.collisionradius);
+            shEnemySpawner(Tools::Science::Vec2(x, y));
 
             msActiveEnemies++;
         }
@@ -462,10 +466,10 @@ namespace Scene
     
     void GeoWarsMainScene::sShoot(ActorManager::ActorPtr actor)
     {
-        float x = actor->get<Components::CShape>().mShape.getPosition().x;
-        float y = actor->get<Components::CShape>().mShape.getPosition().y;
+        float x = actor->get<Components::CShape>().shape.getPosition().x;
+        float y = actor->get<Components::CShape>().shape.getPosition().y;
 
-        auto bullet = mActorManager.createActor(Actor::ActorTypeEnum::BULLET);
+        auto bullet = BaseScene::mActorManager.createActor(Actor::ActorTypeEnum::BULLET);
 
         Tools::Science::Vec2 speed = { msMouseCapture.x - x, msMouseCapture.y - y };
         speed.normalize();
@@ -474,14 +478,10 @@ namespace Scene
 
         // COMPONENT.SHAPE
 
-        auto& componentShape = bullet->add<Components::CShape>(mGameEngine->mBulletData.radius, mGameEngine->font, mGameEngine->mBulletData.vertices);
-        componentShape.mShape.setFillColor(mGameEngine->mBulletData.fillcolor);
-        componentShape.mShape.setOutlineColor(mGameEngine->mBulletData.fillcolor);
-        componentShape.mShape.setPosition(sf::Vector2f(x, y));
-        // COMPONENT.SHAPE::label
-        componentShape.mLabel.setString(sf::String(""));
-        // MUST set Font here or else the reference is lost for some reason
-        componentShape.mLabel.setFont(componentShape.mFont);
+        auto& componentShape = bullet->add<Components::CShape>(mGameEngine->mBulletData.radius, mGameEngine->mBulletData.vertices);
+        componentShape.shape.setFillColor(mGameEngine->mBulletData.fillcolor);
+        componentShape.shape.setOutlineColor(mGameEngine->mBulletData.fillcolor);
+        componentShape.shape.setPosition(sf::Vector2f(x, y));
 
         //COMPONENT.COLLISION
         bullet->add<Components::CCollision>(mGameEngine->mBulletData.collisionradius);
@@ -502,24 +502,20 @@ namespace Scene
 
         if (msSpecialWait == 0)
         {
-            float x = actor->get<Components::CShape>().mShape.getPosition().x;
-            float y = actor->get<Components::CShape>().mShape.getPosition().y;
+            float x = actor->get<Components::CShape>().shape.getPosition().x;
+            float y = actor->get<Components::CShape>().shape.getPosition().y;
 
-            auto shield = mActorManager.createActor(Actor::ActorTypeEnum::SHIELD);
+            auto shield = BaseScene::mActorManager.createActor(Actor::ActorTypeEnum::SHIELD);
             shield->add<Components::CTransform>(Tools::Science::Vec2(x, y),
                 Tools::Science::Vec2(mGameEngine->mActorData.speed, mGameEngine->mActorData.speed));
 
             float radius = mGameEngine->mActorData.radius + mGameEngine->mActorData.specialSeparation * (1 + mGameEngine->mActorData.specialAmount - msSpecials);
-            int thick = 2 * mGameEngine->mActorData.outlinethickness * (mGameEngine->mActorData.specialAmount - msSpecials);
-            auto& componentShape = shield->add<Components::CShape>(radius, mGameEngine->font, mGameEngine->mActorData.vertices);
-            componentShape.mShape.setFillColor(sf::Color(0, 0, 0, 0));
-            componentShape.mShape.setOutlineColor(sf::Color(108, 187, 209)); // electric teal
-            componentShape.mShape.setOutlineThickness(thick);
-            componentShape.mShape.setPosition(sf::Vector2f(x, y));
-            // COMPONENT.SHAPE::label
-            componentShape.mLabel.setString(sf::String(""));
-            // MUST set Font here or else the reference is lost for some reason
-            componentShape.mLabel.setFont(componentShape.mFont);
+            int thick = 4 * (mGameEngine->mActorData.specialAmount - msSpecials);
+            auto& componentShape = shield->add<Components::CShape>(radius, 6);
+            componentShape.shape.setFillColor(sf::Color(0, 0, 0, 0));
+            componentShape.shape.setOutlineColor(sf::Color(108, 187, 209)); // electric teal
+            componentShape.shape.setOutlineThickness(thick);
+            componentShape.shape.setPosition(sf::Vector2f(x, y));
 
             //COMPONENT.COLLISION
             shield->add<Components::CCollision>(radius);
@@ -542,7 +538,7 @@ namespace Scene
     void GeoWarsMainScene::sInvincibility(ActorManager::ActorPtr actor)
     {
         auto& actorShape = actor->get<Components::CShape>();
-        sf::Color color = actorShape.mShape.getOutlineColor();
+        sf::Color color = actorShape.shape.getOutlineColor();
 
         if (msInvincible == 0)
         {
@@ -550,8 +546,7 @@ namespace Scene
             msInvincibleColor = false;
 
             sf::Color color = sf::Color::White;
-            actorShape.mShape.setOutlineColor(color);
-            actorShape.mLabel.setFillColor(color);
+            actorShape.shape.setOutlineColor(color);
         }
         else
         {
@@ -564,8 +559,7 @@ namespace Scene
             {
                 msInvincibleBlink = 10;
                 msInvincibleColor = !msInvincibleColor;
-                actorShape.mShape.setOutlineColor(color);
-                actorShape.mLabel.setFillColor(color);
+                actorShape.shape.setOutlineColor(color);
             }
             msInvincibleBlink--;
         }

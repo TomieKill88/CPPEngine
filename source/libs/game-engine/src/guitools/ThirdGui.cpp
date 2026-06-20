@@ -2,11 +2,12 @@
 
 #include "ThirdGui.hpp"
 #include "GameEngine.hpp"
+#include "scenes/GeoWarsMainScene.hpp"
 
 namespace GuiTools
 {
 
-	ThirdGui::ThirdGui(Scene::GeoWarsMainScene* sceneInterface) : mSceneInterface(sceneInterface)
+	ThirdGui::ThirdGui(GameEngine::GameEngine* gameEngineInterface, Scene::GeoWarsMainScene* mainSceneInterface) : BaseGui(gameEngineInterface), mMainSceneInterface(mainSceneInterface)
 	{
 	};
 
@@ -20,9 +21,10 @@ namespace GuiTools
 			}
 			else
 			{
-				auto player = mSceneInterface->mActorManager.getActorsOfType(Actor::ActorTypeEnum::PLAYER);
-				auto enemies = mSceneInterface->mActorManager.getActorsOfType(Actor::ActorTypeEnum::ENEMY);
-				auto bullets = mSceneInterface->mActorManager.getActorsOfType(Actor::ActorTypeEnum::BULLET);
+				
+				auto player = mMainSceneInterface->mActorManager.getActorsOfType(Actor::ActorTypeEnum::PLAYER);
+				auto enemies = mMainSceneInterface->mActorManager.getActorsOfType(Actor::ActorTypeEnum::ENEMY);
+				auto bullets = mMainSceneInterface->mActorManager.getActorsOfType(Actor::ActorTypeEnum::BULLET);
 
 				ImGuiTabBarFlags tab_bar_flags = ImGuiTabBarFlags_None;
 				if (ImGui::BeginTabBar("MyTabBar", tab_bar_flags))
@@ -31,59 +33,63 @@ namespace GuiTools
 					{
 						ImGui::SeparatorText("Enemies");
 						if (ImGui::Button("Spawn##enemy")) {
-							mSceneInterface->sEnemySpawner();
+							mMainSceneInterface->sEnemySpawner();
 						}
 
 						ImGui::SeparatorText("Actions");
 						ImGui::Text("UP");
 						ImGui::SameLine();
 						if (ImGui::Button("START##up")) {
-							mSceneInterface->sInput(Scene::ActionStateEnum::START, GameEngine::Input::InputCode::KEYBOARD_UP);
+							BaseGui::mGameEngineInterface->sInput(Scene::ActionStateEnum::START, GameEngine::Input::InputCode::KEYBOARD_UP);
 						}
 						ImGui::SameLine();
 						if (ImGui::Button("END##up")) {
-							mSceneInterface->sInput(Scene::ActionStateEnum::END, GameEngine::Input::InputCode::KEYBOARD_UP);
+							BaseGui::mGameEngineInterface->sInput(Scene::ActionStateEnum::END, GameEngine::Input::InputCode::KEYBOARD_UP);
 						}
 
 						ImGui::Text("DOWN");
 						ImGui::SameLine();
 						if (ImGui::Button("START##down")) {
-							mSceneInterface->sInput(Scene::ActionStateEnum::START, GameEngine::Input::InputCode::KEYBOARD_DOWN);
+							BaseGui::mGameEngineInterface->sInput(Scene::ActionStateEnum::START, GameEngine::Input::InputCode::KEYBOARD_DOWN);
 						}
 						ImGui::SameLine();
 						if (ImGui::Button("END##down")) {
-							mSceneInterface->sInput(Scene::ActionStateEnum::END, GameEngine::Input::InputCode::KEYBOARD_DOWN);
+							BaseGui::mGameEngineInterface->sInput(Scene::ActionStateEnum::END, GameEngine::Input::InputCode::KEYBOARD_DOWN);
 						}
 
 						ImGui::Text("LEFT");
 						ImGui::SameLine();
 						if (ImGui::Button("START##left")) {
-							mSceneInterface->sInput(Scene::ActionStateEnum::START, GameEngine::Input::InputCode::KEYBOARD_LEFT);
+							BaseGui::mGameEngineInterface->sInput(Scene::ActionStateEnum::START, GameEngine::Input::InputCode::KEYBOARD_LEFT);
 						}
 						ImGui::SameLine();
 						if (ImGui::Button("END##left")) {
-							mSceneInterface->sInput(Scene::ActionStateEnum::END, GameEngine::Input::InputCode::KEYBOARD_LEFT);
+							BaseGui::mGameEngineInterface->sInput(Scene::ActionStateEnum::END, GameEngine::Input::InputCode::KEYBOARD_LEFT);
 						}
 
 						ImGui::Text("RIGHT");
 						ImGui::SameLine();
 						if (ImGui::Button("START##right")) {
-							mSceneInterface->sInput(Scene::ActionStateEnum::START, GameEngine::Input::InputCode::KEYBOARD_RIGHT);
+							BaseGui::mGameEngineInterface->sInput(Scene::ActionStateEnum::START, GameEngine::Input::InputCode::KEYBOARD_RIGHT);
 						}
 						ImGui::SameLine();
 						if (ImGui::Button("END##right")) {
-							mSceneInterface->sInput(Scene::ActionStateEnum::END, GameEngine::Input::InputCode::KEYBOARD_RIGHT);
+							BaseGui::mGameEngineInterface->sInput(Scene::ActionStateEnum::END, GameEngine::Input::InputCode::KEYBOARD_RIGHT);
 						}
 
 						ImGui::Text("SPECIAL");
 						ImGui::SameLine();
 						if (ImGui::Button("START##special")) {
-							mSceneInterface->sInput(Scene::ActionStateEnum::START, GameEngine::Input::InputCode::MOUSE_RIGHT);
+							BaseGui::mGameEngineInterface->sInput(Scene::ActionStateEnum::START, GameEngine::Input::InputCode::MOUSE_RIGHT);
 						}
 						ImGui::SameLine();
 						if (ImGui::Button("END##special")) {
-							mSceneInterface->sInput(Scene::ActionStateEnum::START, GameEngine::Input::InputCode::MOUSE_RIGHT);
+							BaseGui::mGameEngineInterface->sInput(Scene::ActionStateEnum::END, GameEngine::Input::InputCode::MOUSE_RIGHT);
 						}
+
+						ImGui::SeparatorText("Save Scene");
+						if (ImGui::Button("Save"))
+							BaseGui::mGameEngineInterface->saveScene();
 
 						ImGui::EndTabItem();
 					}
@@ -94,11 +100,11 @@ namespace GuiTools
 							if (player.size() > 0)
 							{
 								auto obj = player[0];
-								auto pos = obj->get<Components::CShape>().mShape.getPosition();
+								auto pos = obj->get<Components::CShape>().shape.getPosition();
 								ImGui::Text("Player");
 								ImGui::SameLine();
 								if (ImGui::Button("D##Player")) { 
-									BaseGui::mGameEngineInterface->mActorManager.destroyActor(obj->getId()); 
+									mMainSceneInterface->mActorManager.destroyActor(obj->getId());
 								}
 
 								ImGui::SameLine();
@@ -120,13 +126,13 @@ namespace GuiTools
 							for each (auto enemy in enemies)
 							{
 						
-								auto pos = enemy->get<Components::CShape>().mShape.getPosition();
+								auto pos = enemy->get<Components::CShape>().shape.getPosition();
 								std::string dest = "D##" + enemy->getTagString();
 								ImGui::Text(enemy->getTagString().c_str());
 								ImGui::SameLine();
 								if (ImGui::Button(dest.c_str())) {
-									BaseGui::mGameEngineInterface->mActorManager.destroyActor(enemy->getId());
-									BaseGui::mGameEngineInterface->activeEnemies -= 1;
+									mMainSceneInterface->mActorManager.destroyActor(enemy->getId());
+									mMainSceneInterface->msActiveEnemies -= 1;
 								}
 
 								ImGui::SameLine();
@@ -145,12 +151,12 @@ namespace GuiTools
 				{
 					for each (auto bullet in bullets)
 					{
-						auto pos = bullet->get<Components::CShape>().mShape.getPosition();
+						auto pos = bullet->get<Components::CShape>().shape.getPosition();
 						std::string dest = "D##" + bullet->getTagString();
 						ImGui::Text(bullet->getTagString().c_str());
 						ImGui::SameLine();
 						if (ImGui::Button(dest.c_str())) {
-							BaseGui::mGameEngineInterface->mActorManager.destroyActor(bullet->getId());
+							mMainSceneInterface->mActorManager.destroyActor(bullet->getId());
 						}
 
 						ImGui::SameLine();

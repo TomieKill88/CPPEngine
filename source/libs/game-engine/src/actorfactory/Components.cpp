@@ -23,16 +23,13 @@ namespace Components
 		exists = true;
 	}
 
-	CShape::CShape() : mLabel(mFont)
-	{
-	}
-
-	CShape::CShape(float radius, sf::Font& font, int pointCount) : mFont(font), mLabel(font)
+	CShape::CShape(float radius, int pointCount)
 	{
 		exists = true;
-		mShape.setRadius(radius);
-		mShape.setPointCount(pointCount);
-		mShape.setOrigin(mShape.getLocalBounds().getCenter());
+		shape = std::make_unique<sf::CircleShape>();
+		dynamic_cast<>(shape)->setRadius(radius);
+		shape.setPointCount(pointCount);
+		shape.setOrigin(shape.getLocalBounds().getCenter());
 	}
 
 	CLifespan::CLifespan(int lifeFrames) : mLifeFrames(lifeFrames), mRemainingFrames(lifeFrames)

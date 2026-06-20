@@ -40,6 +40,16 @@ namespace Actor
 		return tagid;
 	}
 
+	sf::Text Actor::renderTagString(sf::Font& font)
+	{
+		sf::Text label(font);
+		label.setString(getTagString());
+		label.setOrigin(label.getLocalBounds().getCenter());
+		label.setPosition(get<Components::CShape>().shape.getPosition());
+
+		return label;
+	}
+
 	void Actor::destroy()
 	{
 		mAlive = false;

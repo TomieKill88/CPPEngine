@@ -22,7 +22,8 @@ namespace Scene
 		// asset vector
 		int mFrameCounter = 0;
 		ActionMap mActionMap;
-		bool mPaused = false;		
+		bool mPaused = false;
+
 
 		void simulate(int iterations);
 
@@ -30,6 +31,8 @@ namespace Scene
 		BaseScene() = default;
 		BaseScene(GameEngine::GameEngine* gameEngine) : mGameEngine(gameEngine){}
 		~BaseScene() = default;
+
+		void saveScene(std::string & sceneName);
 
 		virtual void update() = 0;
 		virtual void doAction(Action pAction) = 0;

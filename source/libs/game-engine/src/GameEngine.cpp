@@ -14,8 +14,9 @@
 #include "InputCodes.hpp"
 #include "actorfactory/ActorType.hpp"
 #include "src/general/Random.hpp"
-#include "scenes/GeoWarsMainScene.hpp"
 #include "scenes/Action.hpp"
+#include "scenes/GeoWarsMainScene.hpp"
+#include "scenes/GeoWarsPauseScene.hpp"
 
 
 namespace GameEngine
@@ -33,8 +34,10 @@ namespace GameEngine
 
         mCurrentScene = std::make_shared<Scene::GeoWarsMainScene>(this);
         mScenes["Main"] = mCurrentScene;
+        mCurrenSceneKey = "Main";
+        mScenes["Pause"] = std::make_shared<Scene::GeoWarsPauseScene>(this);
 
-        //mGuiTools = std::make_unique<GuiTools::ThirdGui>(this);
+        mGuiTools = std::make_unique<GuiTools::ThirdGui>(this, std::dynamic_pointer_cast<Scene::GeoWarsMainScene>(mCurrentScene).get());
     }
 
     void GameEngine::init()
@@ -62,25 +65,40 @@ namespace GameEngine
             mWindow.setFramerateLimit(mWindowData.framerate);
 
             // ASSETS
-            if (!font.openFromFile(mConfigFile["fonts"][0]["file"].get<std::string>()))
-                std::cout << "ERROR opening font" << std::endl;
-            mAssetsData.fontsize = mConfigFile["fonts"][0]["size"].get<int>();
-            mAssetsData.fontcolor = sf::Color(mConfigFile["fonts"][0]["color"][0].get<int>(),
-                mConfigFile["fonts"][0]["color"][1].get<int>(),
-                mConfigFile["fonts"][0]["color"][2].get<int>());
+            if (!mFontsData.font.openFromFile(mConfigFile["resources"]["fonts"][0]["file"].get<std::string>()))
+                std::cout << "ERROR opening font: " << mConfigFile["fonts"][0]["file"].get<std::string>() << std::endl;
+            mFontsData.fontsize = mConfigFile["resources"]["fonts"][0]["size"].get<int>();
+            mFontsData.fontcolor = sf::Color(mConfigFile["resources"]["fonts"][0]["color"][0].get<int>(),
+                                             mConfigFile["resources"]["fonts"][0]["color"][1].get<int>(),
+                                             mConfigFile["resources"]["fonts"][0]["color"][2].get<int>());
+
+            //Textures
+            size_t texturesSize = mConfigFile["resources"]["textures"].size();
+            for (int i = 0; i < texturesSize; i++)
+            {  
+                auto textureConfig = mConfigFile["resources"]["textures"][i];
+                auto textureName = textureConfig["name"].get<std::string>();
+                mTextures[textureName].texture = sf::Texture(textureConfig["file"].get<std::string>());
+                mTextures[textureName].size.x = textureConfig["size"][0].get<int>();
+                mTextures[textureName].size.y = textureConfig["size"][1].get<int>();
+
+                size_t spritesSize = textureConfig["sprites"].size();
+                for (int j = 0; j < spritesSize; j++)
+                {
+                    auto spriteConfig = textureConfig["sprites"][j];
+                    auto spriteName = spriteConfig["name"].get<std::string>();
+                    mSprites[spriteName].texture = &mTextures[textureName].texture;
+                    mSprites[spriteName].subrect.size.x = spriteConfig["size"][0].get<int>();
+                    mSprites[spriteName].subrect.size.y = spriteConfig["size"][1].get<int>();
+                    mSprites[spriteName].subrect.position.x = spriteConfig["position"][0].get<int>();
+                    mSprites[spriteName].subrect.position.y = spriteConfig["position"][1].get<int>();
+                }                
+            }
 
             // PLAYER
             auto playerConfig = mConfigFile["actors"]["player"];
             mActorData.speed = playerConfig["speed"].get<float>();
-            mActorData.radius = playerConfig["radius"].get<float>();
-            mActorData.vertices = playerConfig["vertices"].get<int>();
-            mActorData.fillcolor = sf::Color(playerConfig["fillcolor"][0].get<int>(),
-                                            playerConfig["fillcolor"][1].get<int>(),
-                                            playerConfig["fillcolor"][2].get<int>());
-            mActorData.outlinecolor = sf::Color(playerConfig["oulinecolor"][0].get<int>(),
-                                                playerConfig["oulinecolor"][1].get<int>(),
-                                                playerConfig["oulinecolor"][2].get<int>());
-            mActorData.outlinethickness = playerConfig["oulinethickness"].get<int>();
+            mActorData.sprite = playerConfig["sprite"].get<std::string>();
             mActorData.collisionradius = playerConfig["collisionradius"].get<float>();
             mActorData.specialAmount = playerConfig["specialamount"].get<int>();
             mActorData.specialLifespan = playerConfig["speciallifespan"].get<int>();
@@ -122,7 +140,7 @@ namespace GameEngine
         ImGui::SFML::Update(mWindow, mClock.restart());
 
         // Gui tool update begin - widgets - end
-        //mGuiTools->update();
+        mGuiTools->update();
 
         // Scene Update (systems)
         mCurrentScene->update();
@@ -172,13 +190,19 @@ namespace GameEngine
 
     void GameEngine::changeScene(std::string& newScene)
     {
-        /*if (mScenes.find(newScene) == mScenes.end())
+        if (mScenes.find(newScene) == mScenes.end())
         {
             std::cout << "ERROR: " << newScene << " is not an existing scene." << std::endl;
             return;
         }
 
-        mCurrentScene = newScene;*/
+        mCurrentScene = mScenes[newScene];
+        mCurrenSceneKey = newScene;
+    }
+
+    void GameEngine::saveScene()
+    {
+        mCurrentScene->saveScene(mCurrenSceneKey);
     }
 
     sf::RenderWindow& GameEngine::getWindow()
@@ -218,4 +242,10 @@ namespace GameEngine
             mCurrentScene->doAction(action);
         }
     }  
+
+    const sSpritesData& GameEngine::getSpriteData(std::string& sprite)
+    {
+        return mSprites[sprite];
+    }
+
 }

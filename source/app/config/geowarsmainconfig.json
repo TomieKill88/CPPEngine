@@ -1,0 +1,25 @@
+{
+  "environment": {
+  },
+  "actors": {
+    "player": {
+      "position": [ 300, 300 ]
+    },
+    "enemies": {
+      "type": [
+        "NORMAL",
+        "NORMAL",
+        "NORMAL",
+        "NORMAL",
+        "NORMAL"
+      ],
+      "position": [
+        [ 50, 50 ],
+        [ 300, 50 ],
+        [ 500, 50 ],
+        [ 220, 600 ],
+        [ 430, 600 ]
+      ]
+    }
+  }
+}

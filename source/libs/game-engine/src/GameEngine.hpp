@@ -22,11 +22,8 @@ namespace GameEngine
 	{
 		float radius = 0.0;
 		float collisionradius = 0.0;
-		int vertices = 0;
 		float speed = 0.0;
-		sf::Color fillcolor = sf::Color::White;
-		sf::Color outlinecolor = sf::Color::White;
-		int outlinethickness = 0;
+		std::string sprite = "";
 		int specialAmount = 0;
 		int specialLifespan = 0;
 		int specialSeparation = 0;
@@ -55,20 +52,44 @@ namespace GameEngine
 		int spanwinterval = -1;
 	};
 
-	struct sAssetsData
+	struct sFontsData
 	{
+		sf::Font font;
 		int fontsize = 0;
 		sf::Color fontcolor = sf::Color::White;
 	};
 
+	struct sSpritesData
+	{
+		sf::Texture* texture;
+		sf::IntRect subrect{ {0,0},{0,0} };
+	};
+
+	struct sTexturesData
+	{
+		sf::Texture texture;
+		Tools::Science::Vec2 size{ 0.0f, 0.0f };
+	};
+
 	class GameEngine
 	{		
+		friend class GuiTools::ThirdGui;
+		//GUIs
+		std::unique_ptr<GuiTools::ThirdGui> mGuiTools;
+
 		//Privates
-		nlohmann::json mConfigFile;		
+		nlohmann::json mConfigFile;
+
+		// Assets CLASS
+		std::map<std::string, sFontsData> mFonts;
+		std::map<std::string, sTexturesData> mTextures;
+		std::map<std::string, sSpritesData> mSprites;
+
 
 		// Scenes
 		std::map<std::string, std::shared_ptr<Scene::BaseScene>> mScenes;
-		std::shared_ptr<Scene::BaseScene> mCurrentScene;		
+		std::shared_ptr<Scene::BaseScene> mCurrentScene;
+		std::string mCurrenSceneKey = "";
 		
 		
 		// SFML
@@ -81,12 +102,11 @@ namespace GameEngine
 	public:
 
 		//Vector<assests>
-		sf::Font font;
 		sWindowData mWindowData;
 		sActorData mActorData;
 		sBulletData mBulletData;
 		sEnemyData mEnemyData; 
-		sAssetsData mAssetsData;
+		sFontsData mFontsData;
 
 		GameEngine();
 		~GameEngine() = default;
@@ -97,11 +117,12 @@ namespace GameEngine
 		void run();
 		void quit();
 		void changeScene(std::string& newScene);
+		void saveScene();
 		sf::RenderWindow& getWindow();
 
 		//SYSTEMS
 		void sInput(Scene::ActionStateEnum pActionState, Input::InputCode pInputCode);
-				
-		
+
+		const sSpritesData& getSpriteData(std::string& sprite);
 	};
 }

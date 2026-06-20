@@ -7,15 +7,19 @@
 #include <SFML/Graphics.hpp>
 
 #include "BaseGui.hpp"
-#include "scenes/GeoWarsMainScene.hpp"
+
+namespace Scene
+{
+	class GeoWarsMainScene;
+}
 
 namespace GuiTools
 {
 	class ThirdGui : public BaseGui
 	{
 	private:
-		Scene::GeoWarsMainScene* mSceneInterface;
 
+		Scene::GeoWarsMainScene* mMainSceneInterface;
 		std::string mShapeNames = "";
 		std::string mWindowName = "ThirdGUI";
 		char nameInput[100] = "";
@@ -28,7 +32,7 @@ namespace GuiTools
 	public:
 
 		ThirdGui() = delete;
-		ThirdGui(Scene::GeoWarsMainScene* sceneInterface);
+		ThirdGui(GameEngine::GameEngine* gameEngineInterface, Scene::GeoWarsMainScene* mainSceneInterface);
 		virtual ~ThirdGui() = default;
 
 		void update() override;

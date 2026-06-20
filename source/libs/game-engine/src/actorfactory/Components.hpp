@@ -56,14 +56,13 @@ namespace Components
 	};
 
 	class CShape : public Component
-	{
+	{		
 	public:
-		sf::CircleShape mShape;
-		sf::Font mFont;
-		sf::Text mLabel;
+		std::unique_ptr<sf::Shape> shape;
 
-		CShape();
-		CShape(float radius, sf::Font& font, int pointCount = 20);
+		CShape() = default;
+		CShape(float radius, int pointCount = 20);
+		CShape(sf::Vector2f size);
 
 		virtual ~CShape() = default;
 	};

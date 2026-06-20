@@ -18,8 +18,8 @@ list(APPEND game-engine_SOURCES  # sources
 								src/actorfactory/Actor.cpp
 								src/actorfactory/ActorManager.hpp
 								src/actorfactory/ActorManager.cpp
-								src/actorfactory/CustomShape.hpp
-								src/actorfactory/CustomShape.cpp
+								#src/actorfactory/CustomShape.hpp
+								#src/actorfactory/CustomShape.cpp
 								
 								# GUI-tools
 								src/guitools/BaseGui.hpp
@@ -28,14 +28,16 @@ list(APPEND game-engine_SOURCES  # sources
 								#src/guitools/FirstGui.cpp
 								#src/guitools/SecondGui.hpp
 								#src/guitools/SecondGui.cpp
-								#src/guitools/ThirdGui.hpp
-								#src/guitools/ThirdGui.cpp
+								src/guitools/ThirdGui.hpp
+								src/guitools/ThirdGui.cpp
 
 								# Scenes
 								src/scenes/BaseScene.hpp
 								src/scenes/BaseScene.cpp
 								src/scenes/GeoWarsMainScene.hpp
 								src/scenes/GeoWarsMainScene.cpp
+								src/scenes/GeoWarsPauseScene.hpp
+								src/scenes/GeoWarsPauseScene.cpp
 								src/scenes/ActionType.hpp
 								src/scenes/ActionType.cpp
 								src/scenes/Action.hpp

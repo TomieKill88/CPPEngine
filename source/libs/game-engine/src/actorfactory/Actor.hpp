@@ -57,6 +57,8 @@ namespace Actor
 		ActorTypeEnum getTag();
 		std::string getTagString();
 
+		sf::Text renderTagString(sf::Font& font);
+
 		// COMPONENTS
 		template<typename T>
 		T& get()

@@ -50,20 +50,20 @@ add_subdirectory(libs)
 #--------------------------------------------------------------------------
 # Resources (https://www.fontspace.com/category/ttf?p=2)
 #--------------------------------------------------------------------------
-list(APPEND resources  resources/AovelSans.ttf)
+#list(APPEND resources  resources/AovelSans.ttf)
 #--------------------------------------------------------------------------
 # Config
-#--------------------------------------------------------------------------						
-
-list(APPEND config  app/config/appconfig.json)						
+#--------------------------------------------------------------------------	
+#list(APPEND config  app/config/appconfig.json)
+#list(APPEND config  app/config/geowarsmainconfig.json)	
 
 #--------------------------------------------------------------------------
 # Install
 #--------------------------------------------------------------------------
-install(FILES ${resources}
+install(DIRECTORY resources/
 		DESTINATION ${INSTALL_BINDIR}/resources
 )
 
-install(FILES ${config}
+install(DIRECTORY app/config/
 		DESTINATION ${INSTALL_BINDIR}/config
 )
